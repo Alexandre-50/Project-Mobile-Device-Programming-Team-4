@@ -1,15 +1,15 @@
-import { Text, View } from "react-native";
+// index.tsx
+import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 
 export default function Index() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Test</Text>
-    </View>
-  );
+    const router = useRouter();
+
+    useEffect(() => {
+        setTimeout(() => {
+            router.replace('./screens/HomeScreen');
+        }, 0); // Utilisation de setTimeout pour attendre le montage complet
+    }, []);
+
+    return null; // Rien à afficher car la redirection est immédiate
 }
