@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 
 const HomeScreen = () => {
-    const router = useRouter(); // Utilisation de useRouter d'expo-router
+    const router = useRouter();
 
     const handlePress = () => {
-        router.push('./SignUpScreen'); // Utilisation de push pour la navigation
+        router.push('./SignUpScreen');
     };
 
     return (
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 20,
-        backgroundColor: '#d3d3d3',
+        backgroundColor: '#ffffff', // Fond blanc
     },
     circleTopLeft: {
         position: 'absolute',
