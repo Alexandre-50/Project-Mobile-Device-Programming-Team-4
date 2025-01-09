@@ -1,4 +1,3 @@
-// index.tsx
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 
@@ -8,10 +7,8 @@ export default function Index() {
     useEffect(() => {
         setTimeout(() => {
             router.replace('./verifFirebase');
-        }, 0); // Utilisation de setTimeout pour attendre le montage complet
+        }, 0);
     }, []);
 
-    return null; // Rien à afficher car la redirection est immédiate
+    return null;
 }
-
-
