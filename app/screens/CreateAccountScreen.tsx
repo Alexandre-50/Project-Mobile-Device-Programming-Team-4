@@ -1,33 +1,53 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { MaterialIcons } from '@expo/vector-icons';
 
-const LoginScreen = () => {
+const CreateAccountScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [secureTextEntry, setSecureTextEntry] = useState(true);
+    const [secureTextEntry1, setSecureTextEntry1] = useState(true);
     const router = useRouter();
 
-    const handleLogin = async () => {
-        try {
-            if (!email || !password) {
-                setError('Veuillez remplir tous les champs.');
-                return;
-            }
-            await signInWithEmailAndPassword(auth, email, password);
-            router.push('./validation');
-        } catch (error) {
-            setError('Identifiants incorrects, veuillez réessayer.');
+    const handleSignUp = async () => {
+        if (password !== confirmPassword) {
+            setError('Les mots de passe ne correspondent pas.');
+            return;
         }
+        if (!email || !password) {
+            setError('Veuillez remplir tous les champs.');
+            return;
+        }
+        try {
+    await createUserWithEmailAndPassword(auth, email, password);
+    router.push('./LoginScreen');
+} catch (error) {
+    if (error instanceof Error && "code" in error) {
+        if (error.code === 'auth/invalid-email') {
+            setError('L\'adresse e-mail n\'est pas valide.');
+        } else if (error.code === 'auth/email-already-in-use') {
+            setError('Cette adresse e-mail est déjà utilisée.');
+        } else {
+            setError('Erreur lors de la création du compte.');
+        }
+    } else {
+        setError('Une erreur inconnue est survenue.');
+    }
+}
+
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Connexion</Text>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <MaterialIcons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Créer un compte</Text>
             <TextInput
                 placeholder="Adresse e-mail"
                 placeholderTextColor="gray"
@@ -53,12 +73,26 @@ const LoginScreen = () => {
                     />
                 </TouchableOpacity>
             </View>
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    placeholder="Confirmer le mot de passe"
+                    placeholderTextColor="gray"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={secureTextEntry1}
+                    style={styles.input}
+                />
+                <TouchableOpacity onPress={() => setSecureTextEntry1(!secureTextEntry1)}>
+                    <MaterialIcons style={styles.oeil} 
+                        name={secureTextEntry1 ? "visibility-off" : "visibility"} 
+                        size={24} 
+                        color="gray" 
+                    />
+                </TouchableOpacity>
+            </View>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Se connecter</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('./CreateAccountScreen')}>
-                <Text style={styles.signupText}>Créer un compte</Text>
+            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                <Text style={styles.buttonText}>S'inscrire</Text>
             </TouchableOpacity>
         </View>
     );
@@ -70,6 +104,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
+    },
+    backButton: {
+        position: 'absolute',
+        top: 50,
+        left: 20,
     },
     title: {
         fontSize: 24,
@@ -109,13 +148,7 @@ const styles = StyleSheet.create({
     errorText: {
         color: 'red',
         marginBottom: 10,
-    },
-    signupText: {
-        marginTop: 20,
-        color: '#3498db',
-        textAlign: 'center',
-        fontSize: 16,
     }
 });
 
-export default LoginScreen;
+export default CreateAccountScreen;
