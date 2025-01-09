@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const ValidationScreen = () => {
+const UserScreen = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>Connecté</Text>
+            <Text style={styles.text}>User</Text>
         </View>
     );
 };
@@ -17,9 +17,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     text: {
-        fontSize: 24,
+        fontSize: 32,
         fontWeight: 'bold',
-    }
+    },
 });
 
-export default ValidationScreen;
+export default UserScreen;

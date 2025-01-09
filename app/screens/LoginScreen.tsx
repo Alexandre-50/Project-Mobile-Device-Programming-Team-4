@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
+import { auth, db } from '../../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const LoginScreen = () => {
@@ -18,10 +19,28 @@ const LoginScreen = () => {
                 setError('Veuillez remplir tous les champs.');
                 return;
             }
-            await signInWithEmailAndPassword(auth, email, password);
-            router.push('./validation');
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Correction : vérifier le rôle dans Firestore avec la collection "users"
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                console.log('User data:', userData);
+                if (userData?.role === 'admin') {
+                    router.push('./AdminScreen');
+                } else if (userData?.role === 'user') {
+                    router.push('./UserScreen');
+                } else {
+                    setError('Rôle non reconnu, veuillez contacter l\'administrateur.');
+                }
+            } else {
+                console.log('Utilisateur non trouvé dans la base de données.');
+                setError('Utilisateur non trouvé dans la base de données.');
+            }
         } catch (error) {
-            setError('Identifiants incorrects, veuillez réessayer.');
+            console.error('Erreur lors de la connexion :', error);
+            setError('Identifiants incorrects ou problème de connexion.');
         }
     };
 

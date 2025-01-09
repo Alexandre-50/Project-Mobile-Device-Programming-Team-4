@@ -26,19 +26,19 @@ const CreateAccountScreen = () => {
         try {
     await createUserWithEmailAndPassword(auth, email, password);
     router.push('./LoginScreen');
-} catch (error) {
-    if (error instanceof Error && "code" in error) {
-        if (error.code === 'auth/invalid-email') {
-            setError('L\'adresse e-mail n\'est pas valide.');
-        } else if (error.code === 'auth/email-already-in-use') {
-            setError('Cette adresse e-mail est déjà utilisée.');
+    } catch (error) {
+        if (error instanceof Error && "code" in error) {
+            if (error.code === 'auth/invalid-email') {
+                setError('L\'adresse e-mail n\'est pas valide.');
+            } else if (error.code === 'auth/email-already-in-use') {
+                setError('Cette adresse e-mail est déjà utilisée.');
+            } else {
+                setError('Erreur lors de la création du compte.');
+            }
         } else {
-            setError('Erreur lors de la création du compte.');
+            setError('Une erreur inconnue est survenue.');
         }
-    } else {
-        setError('Une erreur inconnue est survenue.');
     }
-}
 
     };
 
