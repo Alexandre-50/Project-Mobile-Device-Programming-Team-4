@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { auth } from '../firebaseConfig'; // Vérifie bien le chemin d'import
+import { auth } from '../firebaseConfig';
 
 
 const verifFirebase = () => {
@@ -9,7 +9,6 @@ const verifFirebase = () => {
     const [isConnected, setIsConnected] = useState(false);
 
     useEffect(() => {
-        // Vérification de la connexion Firebase
         if (auth) {
             setIsConnected(true);
             console.log('Firebase est bien connecté');
