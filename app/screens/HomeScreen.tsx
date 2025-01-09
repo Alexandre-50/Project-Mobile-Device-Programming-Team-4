@@ -6,7 +6,7 @@ const HomeScreen = () => {
     const router = useRouter();
 
     const handlePress = () => {
-        router.push('./SignUpScreen');
+        router.push('./LoginScreen');
     };
 
     return (

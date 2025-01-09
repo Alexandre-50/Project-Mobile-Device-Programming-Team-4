@@ -7,9 +7,11 @@ export default function Index() {
 
     useEffect(() => {
         setTimeout(() => {
-            router.replace('./screens/HomeScreen');
+            router.replace('./verifFirebase');
         }, 0); // Utilisation de setTimeout pour attendre le montage complet
     }, []);
 
     return null; // Rien à afficher car la redirection est immédiate
 }
+
+
