@@ -1,10 +1,30 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
+// import { useNavigation } from '@react-navigation/native';
 
-const SuperAdminScreen = () => {
+const SuperAdminScreen: React.FC = () => {
+    const router = useRouter();
+
     return (
+        
         <View style={styles.container}>
-            <Text style={styles.text}>SuperAdminScreen</Text>
+            <TouchableOpacity style={styles.profileButton} onPress={() => {}}>
+        <FontAwesome name="user" size={24} color="white" />
+      </TouchableOpacity>
+            <Button
+                title="Manage Admin"
+                onPress={() =>  router.replace('./ManageAdminScreen')}
+            />
+            <Button
+                title="Manage Event"
+                onPress={() => router.replace('./AddEventScreen')}
+            />
+            <Button
+                title="Manage Assos"
+                onPress={() => router.replace('./ManageAssoScreen')}
+            />
         </View>
     );
 };
@@ -14,12 +34,18 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff',
     },
-    text: {
-        fontSize: 32,
-        fontWeight: 'bold',
-    },
+    profileButton: {
+    backgroundColor: '#3498db',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: 50,
+    right: 20,
+  },
 });
 
 export default SuperAdminScreen;

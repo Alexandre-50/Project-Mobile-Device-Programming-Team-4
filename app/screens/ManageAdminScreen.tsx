@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const AddEventScreen = () => {
+const ManageAdminScreen = () => {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>AddEventScreen</Text>
+            <Text style={styles.text}>ManageAdminScreen</Text>
         </View>
     );
 };
@@ -22,4 +22,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddEventScreen;
+export default ManageAdminScreen;
