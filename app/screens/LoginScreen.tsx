@@ -31,6 +31,8 @@ const LoginScreen = () => {
                     router.push('./AdminScreen');
                 } else if (userData?.role === 'user') {
                     router.push('./UserScreen');
+                } else if (userData?.role === 'superadmin') {
+                    router.push('./SuperAdminScreen');
                 } else {
                     setError('Rôle non reconnu, veuillez contacter l\'administrateur.');
                 }
