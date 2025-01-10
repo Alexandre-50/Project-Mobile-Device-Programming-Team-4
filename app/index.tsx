@@ -6,7 +6,7 @@ export default function Index() {
 
     useEffect(() => {
         setTimeout(() => {
-            router.replace('./verifFirebase');
+            router.replace('./screens/HomeScreen');
         }, 0);
     }, []);
 
