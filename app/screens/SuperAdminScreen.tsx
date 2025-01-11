@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Button, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
-// import { useNavigation } from '@react-navigation/native';
 
 const SuperAdminScreen: React.FC = () => {
     const router = useRouter();

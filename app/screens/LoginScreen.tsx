@@ -38,11 +38,11 @@ const LoginScreen = () => {
                 }
             } else {
                 console.log('Utilisateur non trouvé dans la base de données.');
-                setError('Utilisateur non trouvé dans la base de données.');
+                setError('Identifiants incorrects.');
             }
         } catch (error) {
             console.error('Erreur lors de la connexion :', error);
-            setError('Identifiants incorrects ou problème de connexion.');
+            setError('Identifiants incorrects.');
         }
     };
 

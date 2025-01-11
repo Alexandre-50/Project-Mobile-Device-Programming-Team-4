@@ -6,7 +6,7 @@ import { getFirestore } from 'firebase/firestore';
 
 
 // Remplace les valeurs ci-dessous par celles de ta console Firebase
-const firebaseConfig = {
+export const firebaseConfig = {
     apiKey: "AIzaSyDFe5Nfrwc5TJ7CuhUbDSVoftClLElELrE",
     authDomain: "kit4cause-b7a41.firebaseapp.com",
     projectId: "kit4cause-b7a41",
@@ -17,6 +17,7 @@ const firebaseConfig = {
 
 // Initialisation de Firebase
 const app = initializeApp(firebaseConfig);
+
 
 // Exportation des services pour les utiliser dans ton projet
 export const auth = getAuth(app);
