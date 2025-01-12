@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, Button,TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet,TouchableOpacity } from "react-native";
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../firebaseConfig";
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import {  FontAwesome } from '@expo/vector-icons';
 
 // Initialiser Firebase
 const app = initializeApp(firebaseConfig);
