@@ -24,8 +24,6 @@ const ManageAdminScreen = () => {
                 return;
             }
 
-            console.log('Utilisateur connecté:', user.email);
-
             try {
                 const usersRef = collection(db, 'users');
                 const querySnapshot = await getDocs(usersRef);
@@ -35,7 +33,7 @@ const ManageAdminScreen = () => {
                 querySnapshot.forEach((doc) => {
                     const userData = doc.data();
                     if (userData.email == user.email) {
-                        console.log('Rôle de l\'utilisateur:', userData.role);
+                        console.log('Rôle de l\'utilisateur (Manage Admin Screen):', userData.role);
                     }
                     if (userData.role === 'superadmin' && userData.email === user.email) {
                         superAdminFound = true;

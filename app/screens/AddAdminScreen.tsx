@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet,KeyboardAvoidingView,ScrollView,Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebaseConfig';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const AddAdminScreen = () => {
-	
-
     const [Prenom, setPrenom] = useState('');
     const [nom, setNom] = useState('');
     const [email, setEmail] = useState('');
@@ -18,6 +16,24 @@ const AddAdminScreen = () => {
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const [secureTextEntry1, setSecureTextEntry1] = useState(true);
     const router = useRouter();
+
+    useEffect(() => {
+        const checkUserRole = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    console.log('User role:', userDoc.data().role);
+                    if (userDoc.data().role !== 'superadmin') {
+                        router.replace('./LoginScreen');
+                    }
+                }
+            } else {
+                router.replace('./LoginScreen');
+            }
+        };
+        checkUserRole();
+    }, []);
 
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
@@ -29,22 +45,27 @@ const AddAdminScreen = () => {
             return;
         }
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email,password);
-            const user = userCredential.user;
+            const currentUser = auth.currentUser;
 
-            // Ajouter l'utilisateur à Firestore avec un rôle 'user'
-            await setDoc(doc(db, 'users', user.uid), {
-                email: user.email,
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCreate = userCredential.user;
+
+            await setDoc(doc(db, 'users', userCreate.uid), {
+                email: userCreate.email,
                 nom: nom,
                 prenom: Prenom,
-                adresse: "",
-                codePostal: "",
-                ville: "",
-                pays: "",
                 role: 'admin'
             });
 
-            router.back()
+            if (currentUser) {
+                await auth.updateCurrentUser(currentUser);
+                const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                if (userDoc.exists()) {
+                    console.log('Current user role:', userDoc.data().role);
+                }
+            }
+
+            router.push('./ManageAdminScreen');
         } catch (error) {
             if (error instanceof Error && "code" in error) {
                 if (error.code === 'auth/invalid-email') {
@@ -88,7 +109,6 @@ const AddAdminScreen = () => {
               onChangeText={setPrenom}
               style={styles.input}
             />
-            
             
             <TextInput
               placeholder="Adresse e-mail"
@@ -142,63 +162,65 @@ const AddAdminScreen = () => {
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
-      );
-    };
-    
-    const styles = StyleSheet.create({
-      container: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 30,
-      },
-      backButton: {
-        position: 'absolute',
-        top: 40,
-        left: 10,
-      },
-      title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-      },
-      input: {
-        width: '90%',
-        padding: 15,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 10,
-        marginBottom: 15,
-      },
-      passwordContainer: {
-        alignItems: 'center',
-        width: '100%',
-        position: 'relative',
-      },
-      eyeIcon: {
-        position: 'absolute',
-        right: 15,
-        top: 15,
-      },
-      button: {
-        backgroundColor: '#3498db',
-        paddingVertical: 15,
-        borderRadius: 10,
-        marginTop: 10,
-        width: '90%',
-      },
-      buttonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-      },
-      errorText: {
-        color: 'red',
-        marginBottom: 10,
-      },
-    });
-    
+    );
+};
+
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '90%',
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  passwordContainer: {
+    alignItems: 'center',
+    width: '100%',
+    position: 'relative',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 15,
+    top: 15,
+  },
+  button: {
+    backgroundColor: '#3498db',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    width: '90%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
+});
 
 export default AddAdminScreen;
