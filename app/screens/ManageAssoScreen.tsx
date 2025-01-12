@@ -5,7 +5,7 @@ import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/fire
 import { useRouter } from 'expo-router';
 import { firebaseConfig } from '../../firebaseConfig';
 import { initializeApp } from 'firebase/app';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -74,32 +74,41 @@ const ManageAssoScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.headcontainer}>
+            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccount')}>
+                <FontAwesome name="user" size={24} color="white" />
+            </TouchableOpacity>
+            <View style={styles.circleBlue1}></View>
+            <View style={styles.circleBlue2}></View>
+            <View style={styles.circleBlue3}></View>
+            <View style={styles.circleBlue4}></View>
+
             <TouchableOpacity style={styles.backButton} onPress={() => router.push('./SuperAdminScreen')}>
                 <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.title}>Liste des Associations</Text>
-            </View>
+            <Text style={styles.title}>Liste des Assos</Text>
+
             {isSuperAdmin ? (
-                <ScrollView contentContainerStyle={styles.assosListContainer}>
-                    {assos.map((item) => (
-                        <View key={item.id} style={styles.assoItem}>
-                            <View>
-                                <Text style={styles.nomText}>{item.nom}</Text>
-                                <Text style={styles.descriptionText}>{item.description}</Text>
+                <View style={styles.assoListWrapper}>
+                    <ScrollView contentContainerStyle={styles.assosListContainer}>
+                        {assos.map((item) => (
+                            <View key={item.id} style={styles.assoItem}>
+                                <View>
+                                    <Text style={styles.nomText}>{item.nom}</Text>
+                                    <Text style={styles.descriptionText}>{item.description}</Text>
+                                </View>
+                                <TouchableOpacity style={styles.deleteButton} onPress={() => deleteAsso(item.id)}>
+                                    <MaterialIcons name="delete" size={24} color="red" />
+                                </TouchableOpacity>
                             </View>
-                            <TouchableOpacity style={styles.deleteButton} onPress={() => deleteAsso(item.id)}>
-                                <MaterialIcons name="delete" size={24} color="red" />
-                            </TouchableOpacity>
-                        </View>
-                    ))}
-                </ScrollView>
+                        ))}
+                    </ScrollView>
+                </View>
             ) : (
                 <Text style={styles.errorText}>Accès non autorisé</Text>
             )}
             {isSuperAdmin && (
-                <TouchableOpacity style={styles.addButton} onPress={() => router.push('./AddAssoScreen')}>
-                    <Text style={styles.addButtonText}>Ajouter une Association</Text>
+                <TouchableOpacity style={styles.button} onPress={() => router.push('./AddAssoScreen')}>
+                    <Text style={styles.buttonText}>Ajouter une Association</Text>
                 </TouchableOpacity>
             )}
         </View>
@@ -107,40 +116,81 @@ const ManageAssoScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    headcontainer: {
-        backgroundColor: 'rgba(0,122,255,0.3)',
-        width: '100%'
-    },
-        
     container: {
-
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
-        
+    },
+   backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        padding: 10,
+    },
+    circleBlue1: {
+        position: 'absolute',
+        top: -35,
+        left: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    circleBlue2: {
+        position: 'absolute',
+        top: -60,
+        left: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+    circleBlue3: {
+        position: 'absolute',
+        top: -35,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },circleBlue4: {
+        position: 'absolute',
+        top: -60,
+        right: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+    profileButton: {
+        backgroundColor: '#56AEFF',
+        borderRadius: 50,
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 50,
+        transform: [{ translateX: -30 }],
+        left: '50%',
         
     },
-    backButton: {
-        position: 'absolute',
-        top: 30,
-        left: 10,
-        padding: 5,
-        borderRadius: 50,
-        backgroundColor: 'rgba(0,122,255,0.3)'
-        
+    assoListWrapper: {
+        backgroundColor: 'white',
+        height: '50%',
+        justifyContent: 'center',
+        width: '90%',
+        padding: 10,
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: '#ddd',
     },
     assosListContainer: {
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        borderWidth: 1,
-        borderColor: '#ddd',
-        padding: 50,
-        borderRadius: 10
-
     },
     assoItem: {
-        
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 10,
@@ -171,18 +221,18 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'red',
     },
-    addButton: {
-        marginVertical: 20,
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: '#3498db',
-        alignItems: 'center',
-        width: '90%'
+    button: {
+        backgroundColor: '#56AEFF',
+        paddingVertical: 15,
+        paddingHorizontal: 40,
+        marginTop: 20,
+        width:300,
     },
-    addButtonText: {
-        color: 'white',
+    buttonText: {
+        color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

@@ -5,7 +5,7 @@ import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/fire
 import { useRouter } from 'expo-router';
 import { firebaseConfig } from '../../firebaseConfig';
 import { initializeApp } from 'firebase/app';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -77,9 +77,17 @@ const ManageAdminScreen = () => {
 
     return (
         <View style={styles.container}>
+            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccount')}>
+                <FontAwesome name="user" size={24} color="white" />
+            </TouchableOpacity>
+            <View style={styles.circleBlue1}></View>
+            <View style={styles.circleBlue2}></View>
+            <View style={styles.circleBlue3}></View>
+            <View style={styles.circleBlue4}></View>
             <TouchableOpacity style={styles.backButton} onPress={() => router.push('./SuperAdminScreen')}>
                 <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
+            
             <Text style={styles.title}>Liste des Admin</Text>
             {isSuperAdmin ? (
                 <View style={styles.adminListWrapper}>
@@ -90,7 +98,7 @@ const ManageAdminScreen = () => {
                                 {item}
                                 </Text>
                                 <TouchableOpacity onPress={() => deleteAdmin(item)}>
-                                <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
+                                    <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
                                 </TouchableOpacity>
                             </View>
                           
@@ -101,8 +109,8 @@ const ManageAdminScreen = () => {
                 <Text style={styles.errorText}>Accès non autorisé</Text>
             )}
             {isSuperAdmin && (
-                <TouchableOpacity style={styles.addButton} onPress={() => router.push('./AddAdminScreen')}>
-                    <Text style={styles.addButtonText}>Ajouter un Admin</Text>
+                <TouchableOpacity style={styles.button} onPress={() => router.push('./AddAdminScreen')}>
+                    <Text style={styles.buttonText}>Ajouter un Admin</Text>
                 </TouchableOpacity>
             )}
         </View>
@@ -112,18 +120,64 @@ const ManageAdminScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white'
     },
+    circleBlue1: {
+        position: 'absolute',
+        top: -35,
+        left: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    circleBlue2: {
+        position: 'absolute',
+        top: -60,
+        left: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+    circleBlue3: {
+        position: 'absolute',
+        top: -35,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },circleBlue4: {
+        position: 'absolute',
+        top: -60,
+        right: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+    profileButton: {
+        backgroundColor: '#56AEFF',
+        borderRadius: 50,
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 50,
+        transform: [{ translateX: -30 }],
+        left: '50%',
+        
+    },
     backButton: {
         position: 'absolute',
-        top: 20,
+        top: 40,
         left: 20,
         padding: 10,
     },
-    
     adminListWrapper: {
         backgroundColor: 'white',
         height: '50%',
@@ -145,41 +199,39 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 10,
     },
-    
     adminItem: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between", // Espace entre le texte et l'icône
+        justifyContent: "space-between",
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: "#ddd",
     },
     emailText: {
-        flex: 1, // Permet au texte d'occuper l'espace restant
+        flex: 1,
         fontSize: 16,
-        marginRight: 10, // Ajoute de l'espace entre le texte et l'icône
-        overflow: "hidden", // Empêche le texte de dépasser
+        marginRight: 10,
+        overflow: "hidden",
     },
     deleteButton: {
-        paddingHorizontal: 5, // Facultatif : Ajoute un peu d'espace autour de l'icône
+        paddingHorizontal: 5,
     },
-      
-      
     errorText: {
         fontSize: 18,
         color: 'red',
     },
-    addButton: {
+    button: {
+        backgroundColor: '#56AEFF',
+        paddingVertical: 15,
+        paddingHorizontal: 40,
         marginTop: 20,
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: '#3498db',
-        alignItems: 'center',
+        width:300,
     },
-    addButtonText: {
-        color: 'white',
+    buttonText: {
+        color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

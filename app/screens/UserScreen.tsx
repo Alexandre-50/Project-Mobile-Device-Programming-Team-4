@@ -10,7 +10,7 @@ const UserScreen = () => {
         <View style={styles.container}>
             <Text style={styles.text}>User</Text>
             <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccount')}>
-            <FontAwesome name="user" size={24} color="white" />
+                <FontAwesome name="user" size={24} color="white" />
             </TouchableOpacity>
         </View>
         

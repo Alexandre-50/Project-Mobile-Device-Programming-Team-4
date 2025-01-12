@@ -48,6 +48,10 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
+            <View style={styles.circleBlue1}></View>
+            <View style={styles.circleBlue2}></View>
+            <View style={styles.circleBlue3}></View>
+            <View style={styles.circleBlue4}></View>
             <Text style={styles.title}>Connexion</Text>
             <TextInput
                 placeholder="Adresse e-mail"
@@ -88,9 +92,45 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor:'white',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
+    },
+    circleBlue1: {
+        position: 'absolute',
+        top: -35,
+        left: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    circleBlue2: {
+        position: 'absolute',
+        top: -60,
+        left: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+    circleBlue3: {
+        position: 'absolute',
+        top: -35,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },circleBlue4: {
+        position: 'absolute',
+        top: -60,
+        right: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
     },
     title: {
         fontSize: 24,
@@ -114,7 +154,7 @@ const styles = StyleSheet.create({
        right:10,
     },
     button: {
-        backgroundColor: '#3498db',
+        backgroundColor: '#56AEFF',
         paddingVertical: 15,
         paddingHorizontal: 40,
         borderRadius: 10,
@@ -133,7 +173,7 @@ const styles = StyleSheet.create({
     },
     signupText: {
         marginTop: 20,
-        color: '#3498db',
+        color: '#56AEFF',
         textAlign: 'center',
         fontSize: 16,
     }
