@@ -99,6 +99,13 @@ const CreateAccountScreen = () => {
               style={styles.input}
             />
             <TextInput
+              placeholder="Pays"
+              placeholderTextColor="gray"
+              value={Pays}
+              onChangeText={setPays}
+              style={styles.input}
+            />
+            <TextInput
               placeholder="Code Postal"
               placeholderTextColor="gray"
               value={CodePostal}
