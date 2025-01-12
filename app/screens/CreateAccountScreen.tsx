@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet,KeyboardAvoidingView,ScrollView,Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebaseConfig';
@@ -7,6 +7,13 @@ import { doc, setDoc } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const CreateAccountScreen = () => {
+	const [CodePostal,setCodePostal] = useState('');
+    const [Ville,setVille] = useState('');
+    const [Pays,setPays] = useState('');
+
+    const [Adresse, setAdresse] = useState('');
+    const [Prenom, setPrenom] = useState('');
+    const [nom, setNom] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,12 +32,18 @@ const CreateAccountScreen = () => {
             return;
         }
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email,password);
             const user = userCredential.user;
 
             // Ajouter l'utilisateur à Firestore avec un rôle 'user'
             await setDoc(doc(db, 'users', user.uid), {
                 email: user.email,
+                nom: nom,
+                prenom: Prenom,
+                adresse: Adresse,
+                codePostal: CodePostal,
+                ville: Ville,
+                pays: Pays,
                 role: 'user'
             });
 
@@ -51,112 +64,164 @@ const CreateAccountScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <ScrollView
+            contentContainerStyle={styles.container}
+            keyboardShouldPersistTaps="handled"
+          >
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <MaterialIcons name="arrow-back" size={24} color="black" />
+              <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             <Text style={styles.title}>Créer un compte</Text>
+            
             <TextInput
-                placeholder="Adresse e-mail"
-                placeholderTextColor="gray"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                style={styles.input}
+              placeholder="Nom"
+              placeholderTextColor="gray"
+              value={nom}
+              onChangeText={setNom}
+              style={styles.input}
             />
+            <TextInput
+              placeholder="Prénom"
+              placeholderTextColor="gray"
+              value={Prenom}
+              onChangeText={setPrenom}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Adresse"
+              placeholderTextColor="gray"
+              value={Adresse}
+              onChangeText={setAdresse}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Code Postal"
+              placeholderTextColor="gray"
+              value={CodePostal}
+              onChangeText={setCodePostal}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Ville"
+              placeholderTextColor="gray"
+              value={Ville}
+              onChangeText={setVille}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Adresse e-mail"
+              placeholderTextColor="gray"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              style={styles.input}
+            />
+            
             <View style={styles.passwordContainer}>
-                <TextInput
-                    placeholder="Mot de passe"
-                    placeholderTextColor="gray"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={secureTextEntry}
-                    style={styles.input}
+              <TextInput
+                placeholder="Mot de passe"
+                placeholderTextColor="gray"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={secureTextEntry}
+                style={styles.input}
+              />
+              <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.eyeIcon}>
+                <MaterialIcons
+                  name={secureTextEntry ? "visibility-off" : "visibility"}
+                  size={24}
+                  color="gray"
                 />
-                <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)}>
-                    <MaterialIcons style={styles.oeil} 
-                        name={secureTextEntry ? "visibility-off" : "visibility"} 
-                        size={24} 
-                        color="gray" 
-                    />
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
+            
             <View style={styles.passwordContainer}>
-                <TextInput
-                    placeholder="Confirmer le mot de passe"
-                    placeholderTextColor="gray"
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry={secureTextEntry1}
-                    style={styles.input}
+              <TextInput
+                placeholder="Confirmer le mot de passe"
+                placeholderTextColor="gray"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={secureTextEntry1}
+                style={styles.input}
+              />
+              <TouchableOpacity onPress={() => setSecureTextEntry1(!secureTextEntry1)} style={styles.eyeIcon}>
+                <MaterialIcons
+                  name={secureTextEntry1 ? "visibility-off" : "visibility"}
+                  size={24}
+                  color="gray"
                 />
-                <TouchableOpacity onPress={() => setSecureTextEntry1(!secureTextEntry1)}>
-                    <MaterialIcons style={styles.oeil} 
-                        name={secureTextEntry1 ? "visibility-off" : "visibility"} 
-                        size={24} 
-                        color="gray" 
-                    />
-                </TouchableOpacity>
+              </TouchableOpacity>
             </View>
+            
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            
             <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                <Text style={styles.buttonText}>S'inscrire</Text>
+              <Text style={styles.buttonText}>S'inscrire</Text>
             </TouchableOpacity>
-        </View>
-    );
-};
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
+          </ScrollView>
+        </KeyboardAvoidingView>
+      );
+    };
+    
+    const styles = StyleSheet.create({
+      container: {
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
-    },
-    backButton: {
+        paddingVertical: 30,
+      },
+      backButton: {
         position: 'absolute',
-        top: 50,
-        left: 20,
-    },
-    title: {
+        top: 40,
+        left: 10,
+      },
+      title: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-    },
-    input: {
-        width: '100%',
+      },
+      input: {
+        width: '90%',
         padding: 15,
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 10,
         marginBottom: 15,
-    },
-    passwordContainer: {
+      },
+      passwordContainer: {
+        alignItems: 'center',
         width: '100%',
-    },
-    oeil: {
-       position:'absolute',
-       top:-50,
-       right:10,
-    },
-    button: {
+        position: 'relative',
+      },
+      eyeIcon: {
+        position: 'absolute',
+        right: 15,
+        top: 15,
+      },
+      button: {
         backgroundColor: '#3498db',
         paddingVertical: 15,
-        paddingHorizontal: 40,
         borderRadius: 10,
         marginTop: 10,
-        width: '100%',
-    },
-    buttonText: {
+        width: '90%',
+      },
+      buttonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center',
-    },
-    errorText: {
+      },
+      errorText: {
         color: 'red',
         marginBottom: 10,
-    }
-});
+      },
+    });
+    
 
 export default CreateAccountScreen;
