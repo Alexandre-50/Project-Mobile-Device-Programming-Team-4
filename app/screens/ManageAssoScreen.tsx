@@ -74,10 +74,12 @@ const ManageAssoScreen = () => {
 
     return (
         <View style={styles.container}>
+            <View style={styles.headcontainer}>
             <TouchableOpacity style={styles.backButton} onPress={() => router.push('./SuperAdminScreen')}>
                 <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             <Text style={styles.title}>Liste des Associations</Text>
+            </View>
             {isSuperAdmin ? (
                 <ScrollView contentContainerStyle={styles.assosListContainer}>
                     {assos.map((item) => (
@@ -105,30 +107,40 @@ const ManageAssoScreen = () => {
 };
 
 const styles = StyleSheet.create({
+    headcontainer: {
+        backgroundColor: 'rgba(0,122,255,0.3)',
+        width: '100%'
+    },
+        
     container: {
+
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
-        padding: 20
+        
+        
     },
     backButton: {
         position: 'absolute',
-        top: 20,
-        left: 20,
-        padding: 10,
+        top: 30,
+        left: 10,
+        padding: 5,
         borderRadius: 50,
         backgroundColor: 'rgba(0,122,255,0.3)'
+        
     },
     assosListContainer: {
         flexDirection: 'column',
         justifyContent: 'flex-start',
         borderWidth: 1,
         borderColor: '#ddd',
-        padding: 10,
+        padding: 50,
         borderRadius: 10
+
     },
     assoItem: {
+        
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingVertical: 10,
@@ -139,7 +151,8 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 20,
+        
+        marginVertical: 30,
     },
     nomText: {
         fontSize: 18,
@@ -159,7 +172,7 @@ const styles = StyleSheet.create({
         color: 'red',
     },
     addButton: {
-        marginTop: 20,
+        marginVertical: 20,
         padding: 15,
         borderRadius: 10,
         backgroundColor: '#3498db',

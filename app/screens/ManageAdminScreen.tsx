@@ -86,11 +86,14 @@ const ManageAdminScreen = () => {
                     <ScrollView contentContainerStyle={styles.adminListContainer}>
                         {adminEmails.map((item) => (
                             <View key={item} style={styles.adminItem}>
-                                <Text style={styles.emailText}>{item}</Text>
+                                <Text style={styles.emailText} numberOfLines={1} ellipsizeMode="tail">
+                                {item}
+                                </Text>
                                 <TouchableOpacity onPress={() => deleteAdmin(item)}>
-                                    <Text style={styles.deleteButton}>🗑️</Text>
+                                <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
                                 </TouchableOpacity>
                             </View>
+                          
                         ))}
                     </ScrollView>
                 </View>
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
         left: 20,
         padding: 10,
     },
+    
     adminListWrapper: {
         backgroundColor: 'white',
         height: '50%',
@@ -134,26 +138,33 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
     },
-    adminItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-    },
+    
     title: {
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 10,
     },
+    
+    adminItem: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between", // Espace entre le texte et l'icône
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "#ddd",
+    },
     emailText: {
-        fontSize: 18,
+        flex: 1, // Permet au texte d'occuper l'espace restant
+        fontSize: 16,
+        marginRight: 10, // Ajoute de l'espace entre le texte et l'icône
+        overflow: "hidden", // Empêche le texte de dépasser
     },
     deleteButton: {
-        fontSize: 20,
-        color: 'red',
+        paddingHorizontal: 5, // Facultatif : Ajoute un peu d'espace autour de l'icône
     },
+      
+      
     errorText: {
         fontSize: 18,
         color: 'red',
