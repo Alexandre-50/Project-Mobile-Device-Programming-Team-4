@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         width: 150,
         height: 150,
         borderRadius: 75,
-        backgroundColor: 'rgba(0,122,255,0.3)',
+        backgroundColor: 'rgba(0,122,255,0.5)',
     },
     circleBlue2: {
         position: 'absolute',
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         width: 150,
         height: 150,
         borderRadius: 75,
-        backgroundColor: 'rgba(0,122,255,0.3)',
+        backgroundColor: 'rgba(0,122,255,0.5)',
     },circleBlue4: {
         position: 'absolute',
         top: -60,
