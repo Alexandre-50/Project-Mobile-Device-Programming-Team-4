@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../../firebaseConfig';
-import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, getDoc, Timestamp } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const AddEventScreen = () => {
@@ -49,7 +49,7 @@ const AddEventScreen = () => {
             setError('Veuillez remplir tous les champs.');
             return;
         }
-        
+
         const percentValue = Number(percentage);
         if (percentValue < 0 || percentValue > 100) {
             setError('Le pourcentage doit être compris entre 0 et 100.');
@@ -73,8 +73,8 @@ const AddEventScreen = () => {
                 nom: eventName,
                 asso: selectedAsso,
                 pourcentAsso: percentValue,
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString()
+                startDate: Timestamp.fromDate(startDate),
+                endDate: Timestamp.fromDate(endDate)
             });
 
             quitter();
