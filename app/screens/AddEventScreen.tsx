@@ -90,6 +90,10 @@ const AddEventScreen = () => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+                <View style={styles.circleBlue1}></View>
+                <View style={styles.circleBlue2}></View>
+                <View style={styles.circleBlue3}></View>
+                <View style={styles.circleBlue4}></View>
 
                 <TouchableOpacity onPress={() => quitter()} style={styles.backButton}>
                     <MaterialIcons name="arrow-back" size={24} color="black" />
@@ -177,6 +181,42 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 30,
         backgroundColor: 'white'
+    },
+    circleBlue1: {
+        position: 'absolute',
+        top: -35,
+        left: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    circleBlue2: {
+        position: 'absolute',
+        top: -60,
+        left: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+    circleBlue3: {
+        position: 'absolute',
+        top: -35,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    circleBlue4: {
+        position: 'absolute',
+        top: -60,
+        right: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
     },
     modalContainerCentered: {
         flex: 1,

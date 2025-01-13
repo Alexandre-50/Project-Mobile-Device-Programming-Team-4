@@ -30,7 +30,7 @@ const ProfileAccountScreen = () => {
         return <Text>Loading...</Text>;
     }
 
-    const { role, email, nom, prenom, adresse, codePostale, pays, prix } = userInfo;
+    const { role, email, nom, prenom, adresse, codePostale, pays, ville } = userInfo;
 
     return (
         <View style={styles.container}>
@@ -46,29 +46,26 @@ const ProfileAccountScreen = () => {
           </TouchableOpacity>
             {role === 'superadmin' && (
                 <View >
-                    <Text style={styles.role}>SuperAdmin</Text>
                     <Text style={styles.email}>{email}</Text>
+                    <Text style={styles.role}>SuperAdmin</Text>
                 </View>
             )}
 
             {role === 'admin' && (
                 <View >
-                    <Text >{prenom} {nom}</Text>
+                    <Text style={styles.nom}>{prenom} {nom}</Text>
                     <Text style={styles.email}>{email}</Text>
-                    <Text style={styles.role}>{role}</Text>
+                    <Text style={styles.role}>Admin</Text>
                 </View>
             )}
 
             {role === 'user' && (
                 <View >
-                    <Text>Adresse: {adresse}</Text>
-                    <Text>Code Postale: {codePostale}</Text>
-                    <Text>Email: {email}</Text>
-                    <Text>Nom: {nom}</Text>
-                    <Text>Prénom: {prenom}</Text>
-                    <Text>Pays: {pays}</Text>
-                    <Text>Prix: {prix}</Text>
-                    <Text>Role: {role}</Text>
+                    <Text style={styles.nom}>{prenom} {nom}</Text>
+                    <Text style={styles.email}>{email}</Text>
+                    <Text style={styles.adresse}>{codePostale} {ville}</Text>
+                    <Text style={styles.pays}>{pays}</Text>
+                    
                 </View>
             )}
             <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./LoginScreen')}>
@@ -146,10 +143,26 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
         color: 'black',
+        fontWeight: 'bold',
+    },
+    nom: {
+        fontSize: 20,
+        textAlign: 'center',
+        color: 'black',
+        fontWeight: 'bold',
     },
     role: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 16,
+        textAlign: 'center',
+        color: 'black',
+    },
+    adresse: {
+        fontSize: 16,
+        textAlign: 'center',
+        color: 'black',
+    },
+    pays: {
+        fontSize: 16,
         textAlign: 'center',
         color: 'black',
     },
