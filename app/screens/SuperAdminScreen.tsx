@@ -63,7 +63,8 @@ const styles = StyleSheet.create({
         height: 150,
         borderRadius: 75,
         backgroundColor: 'rgba(0,122,255,0.5)',
-    },circleBlue4: {
+    },
+    circleBlue4: {
         position: 'absolute',
         top: -60,
         right: 0,
@@ -83,7 +84,6 @@ const styles = StyleSheet.create({
         top: 50,
         transform: [{ translateX: -30 }],
         left: '50%',
-        
     },
     containernav: {
         flex: 1,

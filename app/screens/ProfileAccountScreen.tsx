@@ -65,7 +65,6 @@ const ProfileAccountScreen = () => {
                     <Text style={styles.email}>{email}</Text>
                     <Text style={styles.adresse}>{codePostale} {ville}</Text>
                     <Text style={styles.pays}>{pays}</Text>
-                    
                 </View>
             )}
             <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./LoginScreen')}>
@@ -117,23 +116,23 @@ const styles = StyleSheet.create({
         borderRadius: 75,
         backgroundColor: 'rgba(0,122,255,0.3)',
     },
+    profileButton: {
+        backgroundColor: '#56AEFF',
+        borderRadius: 50,
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        top: 50,
+        transform: [{ translateX: -30 }],
+        left: '50%',
+    },
     backButton: {
         position: 'absolute',
         top: 40,
         left: 20,
         padding: 10,
-    },
-    profileButton: {
-        backgroundColor: '#56AEFF',
-        borderRadius: 200,
-        width: 170,
-        height: 170,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        top: 100,
-        transform: [{ translateX: -85 }],
-        left: '50%',
     },
     text: {
         fontSize: 18,
