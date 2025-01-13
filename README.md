@@ -48,3 +48,7 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Presentation of the App
+Our mobile application allows users to take part in a lottery to acquire exclusive sportswear from celebrities at a reduced price. Every week, a new selection of items is put online, offering a chance to get rare products at low cost.
+The key goal of the project is to develop a user-friendly and safe mobile application that will revolutionize the way users obtain signed sports memorabilia.
