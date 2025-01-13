@@ -22,7 +22,6 @@ const LoginScreen = () => {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Correction : vérifier le rôle dans Firestore avec la collection "users"
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
                 const userData = userDoc.data();
@@ -41,7 +40,7 @@ const LoginScreen = () => {
                 setError('Identifiants incorrects.');
             }
         } catch (error) {
-            console.error('Erreur lors de la connexion :', error);
+            //console.error('Erreur lors de la connexion :', error);
             setError('Identifiants incorrects.');
         }
     };
