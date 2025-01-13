@@ -106,3 +106,28 @@ const styles = StyleSheet.create({
 
 export default HomeScreen;
 
+//React//
+//React//
+//React//
+//React//
+//React////React//
+//React////React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+//React//
+
