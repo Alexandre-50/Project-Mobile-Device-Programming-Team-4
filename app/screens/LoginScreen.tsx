@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView,Platform, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebaseConfig';
@@ -47,6 +47,10 @@ const LoginScreen = () => {
     };
 
     return (
+        <KeyboardAvoidingView
+                  style={{ flex: 1 }}
+                  behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                >
         <View style={styles.container}>
             <View style={styles.circleBlue1}></View>
             <View style={styles.circleBlue2}></View>
@@ -86,6 +90,7 @@ const LoginScreen = () => {
                 <Text style={styles.signupText}>Créer un compte</Text>
             </TouchableOpacity>
         </View>
+        </KeyboardAvoidingView>
     );
 };
 

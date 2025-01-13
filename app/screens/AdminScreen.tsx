@@ -1,19 +1,24 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
-const AdminScreen: React.FC = () => {
+
+const AdminScreen = () => {
+  const router = useRouter();
   return (
+    
     <View style={styles.container}>
-      {/* Bouton + en bas à droite */}
-      <TouchableOpacity style={styles.addButton} onPress={() => {}}>
+      <TouchableOpacity style={styles.profileButton} onPress={() =>  router.replace('./ProfileAccountScreen')}>
+        <FontAwesome name="user" size={24} color="white" />
+      </TouchableOpacity>
+
+
+      <TouchableOpacity style={styles.addButton} onPress={() =>  router.replace('./AddEventScreen')}>
         <AntDesign name="plus" size={30} color="white" />
       </TouchableOpacity>
 
-      {/* Bouton personnage en haut à droite */}
-      <TouchableOpacity style={styles.profileButton} onPress={() => {}}>
-        <FontAwesome name="user" size={24} color="white" />
-      </TouchableOpacity>
+      
     </View>
   );
 };
