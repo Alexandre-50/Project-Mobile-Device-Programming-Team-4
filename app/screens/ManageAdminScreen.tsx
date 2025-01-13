@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs,getDoc, deleteDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 import { firebaseConfig } from '../../firebaseConfig';
 import { initializeApp } from 'firebase/app';
@@ -15,7 +15,22 @@ const ManageAdminScreen = () => {
     const [adminEmails, setAdminEmails] = useState<string[]>([]);
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const router = useRouter();
-
+    const quitter = async () => {
+        const user = auth.currentUser;
+        if (user) {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                if (userData.role === 'superadmin') {
+                    router.replace('./SuperAdminScreen');
+                } else if (userData.role === 'admin') {
+                    router.replace('./AdminScreen');
+                } else {
+                    router.replace('./HomeScreen');
+                }
+            }
+        }
+    };
     useEffect(() => {
         const checkSuperAdmin = async () => {
             const user = auth.currentUser;
@@ -84,7 +99,7 @@ const ManageAdminScreen = () => {
             <View style={styles.circleBlue2}></View>
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
-            <TouchableOpacity style={styles.backButton} onPress={() => router.push('./SuperAdminScreen')}>
+            <TouchableOpacity style={styles.backButton} onPress={() => quitter()}>
                 <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             

@@ -20,7 +20,7 @@ const SuperAdminScreen: React.FC = () => {
                 <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./ManageAdminScreen')}>
                     <Text style={styles.buttonText}>Manage Admin</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./AddEventScreen')}>
+                <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./ManageEventScreen')}>
                     <Text style={styles.buttonText}>Manage Event</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./ManageAssoScreen')}>

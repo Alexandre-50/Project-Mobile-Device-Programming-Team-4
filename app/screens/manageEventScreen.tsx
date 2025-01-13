@@ -1,109 +1,144 @@
-import React ,{useEffect , useState}from 'react';
-import { View, Text, StyleSheet,TouchableOpacity,FlatList } from 'react-native';
-import { AntDesign, FontAwesome } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { FontAwesome,MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDocs,collection } from 'firebase/firestore';
-import { MaterialIcons } from '@expo/vector-icons';
+import { getFirestore, getDocs, collection } from 'firebase/firestore';
 
-
-const manageEventScreen = () => {
+const ManageEventScreen = () => {
     const [events, setEvents] = useState<any[]>([]);
+    const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState<'past' | 'present' | 'future'>('present');
     const auth = getAuth();
     const db = getFirestore();
     const router = useRouter();
-
+    
     useEffect(() => {
         const fetchAllEvents = async () => {
             try {
-                // Récupérer tous les documents de la collection 'evenements'
                 const eventCollectionRef = collection(db, 'evenements');
                 const eventDocsSnap = await getDocs(eventCollectionRef);
-    
-                // Extraire les données des documents
+
                 const eventList = eventDocsSnap.docs.map(doc => {
                     const data = doc.data();
-    
-                    // Convertir les Timestamps en chaînes lisibles
-                    const startDate = data.startDate?.toDate().toLocaleDateString() || 'Date inconnue';
-                    const endDate = data.endDate?.toDate().toLocaleDateString() || 'Date inconnue';
-    
+                    const startDate = data.startDate?.toDate() || new Date();
+                    const endDate = data.endDate?.toDate() || new Date();
+
                     return {
-                        id: doc.id, // Inclure l'ID du document
-                        ...data, // Inclure les autres champs
-                        startDate, // Remplacer startDate par une chaîne
-                        endDate, // Remplacer endDate par une chaîne
+                        id: doc.id,
+                        ...data,
+                        startDate,
+                        endDate,
                     };
                 });
-    
-                setEvents(eventList); // Mettre à jour les événements
+
+                setEvents(eventList);
             } catch (error) {
                 console.error("Erreur lors de la récupération des événements :", error);
             } finally {
-                setLoading(false); // Désactiver le chargement
+                setLoading(false);
             }
         };
-    
+
         fetchAllEvents();
     }, []);
-    
 
-   
+    useEffect(() => {
+        const now = new Date();
 
+        const filtered = events.filter(event => {
+            if (selectedCategory === 'past') {
+                return event.endDate < now;
+            } else if (selectedCategory === 'present') {
+                return event.startDate <= now && event.endDate >= now;
+            } else if (selectedCategory === 'future') {
+                return event.startDate > now;
+            }
+        });
 
-
+        setFilteredEvents(filtered);
+    }, [selectedCategory, events]);
 
     return (
         <View style={styles.container}>
-            {/* Cercles décoratifs */}
             <View style={styles.circleBlue1}></View>
             <View style={styles.circleBlue2}></View>
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
-
-            {/* Bouton Profil */}
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <MaterialIcons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
             <TouchableOpacity
                 style={styles.profileButton}
                 onPress={() => router.push('./ProfileAccountScreen')}
             >
                 <FontAwesome name="user" size={24} color="white" />
             </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={[styles.categoryButton, selectedCategory === 'past' && styles.selectedButton]}
+                        onPress={() => setSelectedCategory('past')}
+                    >
+                        <Text style={styles.buttonText}>Passé</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.categoryButton, selectedCategory === 'present' && styles.selectedButton]}
+                        onPress={() => setSelectedCategory('present')}
+                    >
+                        <Text style={styles.buttonText}>Présent</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.categoryButton, selectedCategory === 'future' && styles.selectedButton]}
+                        onPress={() => setSelectedCategory('future')}
+                    >
+                        <Text style={styles.buttonText}>Futur</Text>
+                    </TouchableOpacity>
+                </View>
 
-            {/* Liste des événements */}
-            <View style={styles.listeContainer}>
-            <FlatList
-                data={events}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={styles.eventCard}>
-                        {/* Carré blanc */}
-                        <View style={styles.imagePlaceholder} />
+                <View style={styles.listeContainer}>
+                    <FlatList
+                        data={filteredEvents}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => (
+                            <View style={styles.eventCard}>
+                                <View style={styles.imagePlaceholder} />
 
-                        {/* Informations de l'événement */}
-                        <View style={styles.eventDetails}>
-                            <Text style={styles.eventName}>{item.nom}</Text>
-                            <Text style={styles.eventDate}>
-                                {item.startDate} - {item.endDate}
-                            </Text>
-                            <Text style={styles.eventParticipation}>
-                                Participations : {item.participations || 0}
-                            </Text>
-                        </View>
-                    </View>
-                )}
-            />
-            </View>
+                                <View style={styles.eventDetails}>
+                                    <Text style={styles.eventName}>{item.nom}</Text>
+                                    <Text style={styles.eventDate}>
+                                        {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
+                                    </Text>
+                                    <Text style={styles.eventParticipation}>
+                                        Participations : {item.participations || 0}
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+                    />
+                </View>
+                <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./AddEventScreen')}>
+                    <Text style={styles.buttonText}>Add Event</Text>
+                </TouchableOpacity>
+            
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    
     container: {
         flex: 1,
         justifyContent: 'center',
         backgroundColor: '#fff',
         width: '100%',
+    },
+    button: {
+        backgroundColor: '#56AEFF',
+        paddingVertical: 15,
+        paddingHorizontal: 40,
+        width:"70%",
+        left:"15%",
     },
     circleBlue1: {
         position: 'absolute',
@@ -113,6 +148,12 @@ const styles = StyleSheet.create({
         height: 150,
         borderRadius: 75,
         backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 20,
+        padding: 10,
     },
     circleBlue2: {
         position: 'absolute',
@@ -153,12 +194,32 @@ const styles = StyleSheet.create({
         transform: [{ translateX: -30 }],
         left: '50%',
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingHorizontal: 16,
+        marginTop: "30%",
+        padding:20,
+    },
+    categoryButton: {
+        backgroundColor: '#ddd',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+    },
+    selectedButton: {
+        backgroundColor: '#56AEFF',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
     listeContainer: {
         width: '100%',
-        marginTop: "40%",
+        height: '60%',
     },
     eventCard: {
-        
         flexDirection: 'row',
         padding: 16,
         marginBottom: 16,
@@ -186,7 +247,6 @@ const styles = StyleSheet.create({
     eventDetails: {
         flex: 1,
         justifyContent: 'center',
-        
     },
     eventName: {
         fontSize: 16,
@@ -204,4 +264,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default manageEventScreen;
+export default ManageEventScreen;
