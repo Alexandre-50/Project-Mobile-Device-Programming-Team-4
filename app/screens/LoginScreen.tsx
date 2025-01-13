@@ -16,7 +16,7 @@ const LoginScreen = () => {
     const handleLogin = async () => {
         try {
             if (!email || !password) {
-                setError('Veuillez remplir tous les champs.');
+                setError('Please fill the fields.');
                 return;
             }
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -33,15 +33,15 @@ const LoginScreen = () => {
                 } else if (userData?.role === 'superadmin') {
                     router.push('./SuperAdminScreen');
                 } else {
-                    setError('Rôle non reconnu, veuillez contacter l\'administrateur.');
+                    setError('Role not recognised, please contact the administrator.');
                 }
             } else {
-                console.log('Utilisateur non trouvé dans la base de données.');
-                setError('Identifiants incorrects.');
+                console.log('User no found in the database.');
+                setError('Incorrect ID.');
             }
         } catch (error) {
             //console.error('Erreur lors de la connexion :', error);
-            setError('Identifiants incorrects.');
+            setError('Incorrect ID.');
         }
     };
 
@@ -83,10 +83,10 @@ const LoginScreen = () => {
             </View>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Se connecter</Text>
+                <Text style={styles.buttonText}>To connect</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('./CreateAccountScreen')}>
-                <Text style={styles.signupText}>Créer un compte</Text>
+                <Text style={styles.signupText}>Create an account</Text>
             </TouchableOpacity>
         </View>
         </KeyboardAvoidingView>
