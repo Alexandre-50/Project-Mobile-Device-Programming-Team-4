@@ -13,7 +13,7 @@ const SuperAdminScreen: React.FC = () => {
             <View style={styles.circleBlue2}></View>
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
-            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccount')}>
+            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccountScreen')}>
                 <FontAwesome name="user" size={24} color="white" />
             </TouchableOpacity>
             <View style={styles.containernav}>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-   button: {
+    button: {
         backgroundColor: '#56AEFF',
         paddingVertical: 15,
         paddingHorizontal: 40,

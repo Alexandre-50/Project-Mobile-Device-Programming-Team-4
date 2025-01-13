@@ -10,7 +10,6 @@ const CreateAccountScreen = () => {
 	const [CodePostal,setCodePostal] = useState('');
     const [Ville,setVille] = useState('');
     const [Pays,setPays] = useState('');
-
     const [Adresse, setAdresse] = useState('');
     const [Prenom, setPrenom] = useState('');
     const [nom, setNom] = useState('');
@@ -35,7 +34,6 @@ const CreateAccountScreen = () => {
             const userCredential = await createUserWithEmailAndPassword(auth, email,password);
             const user = userCredential.user;
 
-            // Ajouter l'utilisateur à Firestore avec un rôle 'user'
             await setDoc(doc(db, 'users', user.uid), {
                 email: user.email,
                 nom: nom,
@@ -182,12 +180,14 @@ const CreateAccountScreen = () => {
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 30,
+        backgroundColor:'white'
       },
       backButton: {
         position: 'absolute',
         top: 40,
-        left: 10,
-      },
+        left: 20,
+        padding: 10,
+    },
       title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -208,22 +208,23 @@ const CreateAccountScreen = () => {
       },
       eyeIcon: {
         position: 'absolute',
-        right: 15,
+        right: 30,
         top: 15,
       },
       button: {
-        backgroundColor: '#3498db',
+        backgroundColor: '#56AEFF',
         paddingVertical: 15,
+        paddingHorizontal: 40,
         borderRadius: 10,
         marginTop: 10,
         width: '90%',
-      },
-      buttonText: {
+    },
+    buttonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center',
-      },
+    },
       errorText: {
         color: 'red',
         marginBottom: 10,
