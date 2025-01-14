@@ -36,7 +36,7 @@ const AddEventScreen = () => {
                 if (userData.role === 'superadmin') {
                     router.replace('./SuperAdminScreen');
                 } else if (userData.role === 'admin') {
-                    router.replace('./AdminScreen');
+                    router.replace('./ManageEventScreen');
                 } else {
                     router.replace('./HomeScreen');
                 }

@@ -22,24 +22,22 @@ const PaymentScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Retour arrière */}
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <MaterialIcons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
+            
+            
             {/* Cercles décoratifs */}
             <View style={styles.circleBlue1}></View>
             <View style={styles.circleBlue2}></View>
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
 
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <MaterialIcons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
             {/* Illustration */}
             <View style={styles.imageContainer}>
-                <Image
-                    source={{
-                        uri: 'https://via.placeholder.com/150', // Remplacez par une vraie image de carte bancaire si nécessaire
-                    }}
-                    style={styles.cardImage}
-                />
+                <Image 
+                                source={require('../../assets/images/app/carteBleue.png')} 
+                            />
             </View>
 
             {/* Formulaire de paiement */}
@@ -140,8 +138,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,122,255,0.3)',
     },
     imageContainer: {
-        marginTop: 80,
+        marginTop: 70,
         alignItems: 'center',
+        width: '100%',
+        height: 50,
     },
     cardImage: {
         width: 200,

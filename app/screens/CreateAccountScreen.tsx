@@ -20,7 +20,14 @@ const CreateAccountScreen = () => {
     const [secureTextEntry, setSecureTextEntry] = useState(true);
     const [secureTextEntry1, setSecureTextEntry1] = useState(true);
     const router = useRouter();
-
+    const handleBackPress = () => {
+      if (router.canGoBack()) {
+        router.back(); // Revenir à la page précédente s'il y a une page dans l'historique
+      } else {
+        router.push('./LoginScreen'); // Sinon, redirigez explicitement vers la page de connexion
+      }
+    };
+    
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
             setError('Les mots de passe ne correspondent pas.');
@@ -60,138 +67,198 @@ const CreateAccountScreen = () => {
             }
         }
     };
-
     return (
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <ScrollView
-            contentContainerStyle={styles.container}
-            keyboardShouldPersistTaps="handled"
-          >
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          
+          <View style={styles.container}> 
+        
+            
+            {/* Decorative circle in the top-left corner. */}
+            <View style={styles.circleBlue1}></View> 
+            {/* Another decorative circle with more transparency. */}
+            <View style={styles.circleBlue2}></View> 
+            {/* Decorative circle in the top-right corner. */}
+            <View style={styles.circleBlue3}></View> 
+            {/* Another decorative circle in the top-right with transparency. */}
+            <View style={styles.circleBlue4}></View> 
+            <Text style={styles.title}>Créer un compte</Text>
+            <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
               <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.title}>Créer un compte</Text>
-            
-            <TextInput
-              placeholder="Nom"
-              placeholderTextColor="gray"
-              value={nom}
-              onChangeText={setNom}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Prénom"
-              placeholderTextColor="gray"
-              value={Prenom}
-              onChangeText={setPrenom}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Adresse"
-              placeholderTextColor="gray"
-              value={Adresse}
-              onChangeText={setAdresse}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Pays"
-              placeholderTextColor="gray"
-              value={Pays}
-              onChangeText={setPays}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Code Postal"
-              placeholderTextColor="gray"
-              value={CodePostal}
-              onChangeText={setCodePostal}
-              keyboardType="numeric"
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Ville"
-              placeholderTextColor="gray"
-              value={Ville}
-              onChangeText={setVille}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Adresse e-mail"
-              placeholderTextColor="gray"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              style={styles.input}
-            />
-            
-            <View style={styles.passwordContainer}>
-              <TextInput
-                placeholder="Mot de passe"
-                placeholderTextColor="gray"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={secureTextEntry}
-                style={styles.input}
-              />
-              <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.eyeIcon}>
-                <MaterialIcons
-                  name={secureTextEntry ? "visibility-off" : "visibility"}
-                  size={24}
-                  color="gray"
+
+            <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+              <ScrollView
+                contentContainerStyle={styles.containerInput}
+                keyboardShouldPersistTaps="handled"
+              >
+                <TextInput
+                  placeholder="Nom"
+                  placeholderTextColor="gray"
+                  value={nom}
+                  onChangeText={setNom}
+                  style={styles.input}
                 />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.passwordContainer}>
-              <TextInput
-                placeholder="Confirmer le mot de passe"
-                placeholderTextColor="gray"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry={secureTextEntry1}
-                style={styles.input}
-              />
-              <TouchableOpacity onPress={() => setSecureTextEntry1(!secureTextEntry1)} style={styles.eyeIcon}>
-                <MaterialIcons
-                  name={secureTextEntry1 ? "visibility-off" : "visibility"}
-                  size={24}
-                  color="gray"
+                <TextInput
+                  placeholder="Prénom"
+                  placeholderTextColor="gray"
+                  value={Prenom}
+                  onChangeText={setPrenom}
+                  style={styles.input}
                 />
-              </TouchableOpacity>
-            </View>
+                <TextInput
+                  placeholder="Adresse"
+                  placeholderTextColor="gray"
+                  value={Adresse}
+                  onChangeText={setAdresse}
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Pays"
+                  placeholderTextColor="gray"
+                  value={Pays}
+                  onChangeText={setPays}
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Code Postal"
+                  placeholderTextColor="gray"
+                  value={CodePostal}
+                  onChangeText={setCodePostal}
+                  keyboardType="numeric"
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Ville"
+                  placeholderTextColor="gray"
+                  value={Ville}
+                  onChangeText={setVille}
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Adresse e-mail"
+                  placeholderTextColor="gray"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  style={styles.input}
+                />
+                
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    placeholder="Mot de passe"
+                    placeholderTextColor="gray"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={secureTextEntry}
+                    style={styles.input}
+                  />
+                  <TouchableOpacity onPress={() => setSecureTextEntry(!secureTextEntry)} style={styles.eyeIcon}>
+                    <MaterialIcons
+                      name={secureTextEntry ? "visibility-off" : "visibility"}
+                      size={24}
+                      color="gray"
+                    />
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    placeholder="Confirmer le mot de passe"
+                    placeholderTextColor="gray"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={secureTextEntry1}
+                    style={styles.input}
+                  />
+                  <TouchableOpacity onPress={() => setSecureTextEntry1(!secureTextEntry1)} style={styles.eyeIcon}>
+                    <MaterialIcons
+                      name={secureTextEntry1 ? "visibility-off" : "visibility"}
+                      size={24}
+                      color="gray"
+                    />
+                  </TouchableOpacity>
+                </View>
             
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                {error ? <Text style={styles.errorText}>{error}</Text> : null}
             
-            <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-              <Text style={styles.buttonText}>S'inscrire</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </KeyboardAvoidingView>
+                <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+                  <Text style={styles.buttonText}>S'inscrire</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </KeyboardAvoidingView>
+          </View>
       );
     };
     
     const styles = StyleSheet.create({
       container: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        flex: 1,
+        backgroundColor:'white',
         paddingHorizontal: 20,
-        paddingVertical: 30,
-        backgroundColor:'white'
+        width: '100%',
+      },
+      circleBlue1: {
+        position: 'absolute', // Positioned absolutely relative to the screen.
+        top: -35, // Moves the circle slightly outside the top boundary.
+        left: -50, // Moves the circle slightly outside the left boundary.
+        width: 150, // Circle diameter.
+        height: 150, // Circle height (equal to width for a perfect circle).
+        borderRadius: 75, // Makes the shape a circle.
+        backgroundColor: 'rgba(0,122,255,0.5)', // Light blue with transparency.
+    },
+    // Another decorative circle with more transparency.
+    circleBlue2: {
+        position: 'absolute',
+        top: -60,
+        left: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)', // Even lighter blue.
+    },
+    // Decorative circle in the top-right corner.
+    circleBlue3: {
+        position: 'absolute',
+        top: -35,
+        right: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
+    },
+    // Another transparent circle in the top-right.
+    circleBlue4: {
+        position: 'absolute',
+        top: -60,
+        right: 0,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.3)',
+    },
+      containerInput: {
+        marginTop:"20%",
+        flexGrow: 1,
+        alignItems: 'center',
+        backgroundColor:'white',
+        paddingBottom:30,
       },
       backButton: {
         position: 'absolute',
-        top: 40,
+        top: 60,
         left: 20,
         padding: 10,
     },
       title: {
         fontSize: 24,
+        textAlign: 'center',
+        alignItems: 'center',
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginVertical: 70,
+        padding:0,
+        
       },
       input: {
         width: '90%',
