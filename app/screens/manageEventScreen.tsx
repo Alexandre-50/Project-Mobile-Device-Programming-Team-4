@@ -18,11 +18,23 @@ const ManageEventScreen = () => {
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<'past' | 'present' | 'future'>('present');
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const auth = getAuth();
     const db = getFirestore();
     const router = useRouter();
 
     useEffect(() => {
+        const fetchUserRole = async () => {
+            const user = auth.currentUser;
+            if (user) {
+                const userDoc = await getDocs(collection(db, 'users'));
+                const userData = userDoc.docs.find(doc => doc.id === user.uid)?.data();
+                if (userData?.role === 'superadmin') {
+                    setIsSuperAdmin(true);
+                }
+            }
+        };
+
         const fetchAllEvents = async () => {
             try {
                 const eventCollectionRef = collection(db, 'evenements');
@@ -49,7 +61,8 @@ const ManageEventScreen = () => {
                 setLoading(false);
             }
         };
-
+        
+        fetchUserRole();
         fetchAllEvents();
     }, []);
 
@@ -86,9 +99,11 @@ const ManageEventScreen = () => {
             <View style={styles.circleBlue2}></View>
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <MaterialIcons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
+            {isSuperAdmin && (
+                <TouchableOpacity onPress={() => router.replace('./SuperAdminScreen')} style={styles.backButton}>
+                    <MaterialIcons name="arrow-back" size={24} color="black" />
+                </TouchableOpacity>
+            )}
             <TouchableOpacity
                 style={styles.profileButton}
                 onPress={() => router.push('./ProfileAccountScreen')}
