@@ -70,15 +70,9 @@ const CreateAccountScreen = () => {
     return (
           
           <View style={styles.container}> 
-        
-            
-            {/* Decorative circle in the top-left corner. */}
             <View style={styles.circleBlue1}></View> 
-            {/* Another decorative circle with more transparency. */}
             <View style={styles.circleBlue2}></View> 
-            {/* Decorative circle in the top-right corner. */}
-            <View style={styles.circleBlue3}></View> 
-            {/* Another decorative circle in the top-right with transparency. */}
+            <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View> 
             <Text style={styles.title}>Créer un compte</Text>
             <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
@@ -200,15 +194,14 @@ const CreateAccountScreen = () => {
         width: '100%',
       },
       circleBlue1: {
-        position: 'absolute', // Positioned absolutely relative to the screen.
-        top: -35, // Moves the circle slightly outside the top boundary.
-        left: -50, // Moves the circle slightly outside the left boundary.
-        width: 150, // Circle diameter.
-        height: 150, // Circle height (equal to width for a perfect circle).
-        borderRadius: 75, // Makes the shape a circle.
-        backgroundColor: 'rgba(0,122,255,0.5)', // Light blue with transparency.
+        position: 'absolute',
+        top: -35,
+        left: -50,
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(0,122,255,0.5)',
     },
-    // Another decorative circle with more transparency.
     circleBlue2: {
         position: 'absolute',
         top: -60,
@@ -216,9 +209,8 @@ const CreateAccountScreen = () => {
         width: 150,
         height: 150,
         borderRadius: 75,
-        backgroundColor: 'rgba(0,122,255,0.3)', // Even lighter blue.
+        backgroundColor: 'rgba(0,122,255,0.3)',
     },
-    // Decorative circle in the top-right corner.
     circleBlue3: {
         position: 'absolute',
         top: -35,
@@ -228,7 +220,6 @@ const CreateAccountScreen = () => {
         borderRadius: 75,
         backgroundColor: 'rgba(0,122,255,0.5)',
     },
-    // Another transparent circle in the top-right.
     circleBlue4: {
         position: 'absolute',
         top: -60,
