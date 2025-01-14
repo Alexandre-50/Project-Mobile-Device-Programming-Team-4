@@ -27,7 +27,7 @@ const LoginScreen = () => {
                 const userData = userDoc.data();
                 console.log('User data:', userData);
                 if (userData?.role === 'admin') {
-                    router.push('./AdminScreen');
+                    router.push('./ManageEventScreen');
                 } else if (userData?.role === 'user') {
                     router.push('./UserScreen');
                 } else if (userData?.role === 'superadmin') {
