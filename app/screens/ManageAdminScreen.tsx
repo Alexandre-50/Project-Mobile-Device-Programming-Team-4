@@ -90,6 +90,7 @@ const ManageAdminScreen = () => {
         }
     };
 
+
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccount')}>

@@ -1,35 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import { FontAwesome,MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, getDocs, collection } from 'firebase/firestore';
+import { getFirestore, getDocs, collection, doc, deleteDoc } from 'firebase/firestore';
+
+interface Event {
+    id: string;
+    nom: string;
+    startDate: Date;
+    endDate: Date;
+    participations?: number;
+}
 
 const ManageEventScreen = () => {
-    const [events, setEvents] = useState<any[]>([]);
-    const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
+    const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<'past' | 'present' | 'future'>('present');
     const auth = getAuth();
     const db = getFirestore();
     const router = useRouter();
-    
+
     useEffect(() => {
         const fetchAllEvents = async () => {
             try {
                 const eventCollectionRef = collection(db, 'evenements');
                 const eventDocsSnap = await getDocs(eventCollectionRef);
 
-                const eventList = eventDocsSnap.docs.map(doc => {
+                const eventList: Event[] = eventDocsSnap.docs.map(doc => {
                     const data = doc.data();
                     const startDate = data.startDate?.toDate() || new Date();
                     const endDate = data.endDate?.toDate() || new Date();
 
                     return {
                         id: doc.id,
-                        ...data,
+                        nom: data.nom || 'Nom non défini',
                         startDate,
                         endDate,
+                        participations: data.participations || 0,
                     };
                 });
 
@@ -60,6 +69,17 @@ const ManageEventScreen = () => {
         setFilteredEvents(filtered);
     }, [selectedCategory, events]);
 
+    const deleteAdmin = async (event: Event) => {
+        try {
+            const eventDocRef = doc(db, 'evenements', event.id);
+            await deleteDoc(eventDocRef);
+
+            setEvents(events.filter(e => e.id !== event.id));
+        } catch (error) {
+            console.error("Erreur lors de la suppression de l'événement :", error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.circleBlue1}></View>
@@ -67,7 +87,7 @@ const ManageEventScreen = () => {
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <MaterialIcons name="arrow-back" size={24} color="black" />
+                <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.profileButton}
@@ -75,58 +95,60 @@ const ManageEventScreen = () => {
             >
                 <FontAwesome name="user" size={24} color="white" />
             </TouchableOpacity>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={[styles.categoryButton, selectedCategory === 'past' && styles.selectedButton]}
-                        onPress={() => setSelectedCategory('past')}
-                    >
-                        <Text style={styles.buttonText}>Passé</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.categoryButton, selectedCategory === 'present' && styles.selectedButton]}
-                        onPress={() => setSelectedCategory('present')}
-                    >
-                        <Text style={styles.buttonText}>Présent</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.categoryButton, selectedCategory === 'future' && styles.selectedButton]}
-                        onPress={() => setSelectedCategory('future')}
-                    >
-                        <Text style={styles.buttonText}>Futur</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.listeContainer}>
-                    <FlatList
-                        data={filteredEvents}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
-                            <View style={styles.eventCard}>
-                                <View style={styles.imagePlaceholder} />
-
-                                <View style={styles.eventDetails}>
-                                    <Text style={styles.eventName}>{item.nom}</Text>
-                                    <Text style={styles.eventDate}>
-                                        {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
-                                    </Text>
-                                    <Text style={styles.eventParticipation}>
-                                        Participations : {item.participations || 0}
-                                    </Text>
-                                </View>
-                            </View>
-                        )}
-                    />
-                </View>
-                <TouchableOpacity style={styles.button} onPress={() =>  router.replace('./AddEventScreen')}>
-                    <Text style={styles.buttonText}>Add Event</Text>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={[styles.categoryButton, selectedCategory === 'past' && styles.selectedButton]}
+                    onPress={() => setSelectedCategory('past')}
+                >
+                    <Text style={styles.buttonText}>Passé</Text>
                 </TouchableOpacity>
-            
+                <TouchableOpacity
+                    style={[styles.categoryButton, selectedCategory === 'present' && styles.selectedButton]}
+                    onPress={() => setSelectedCategory('present')}
+                >
+                    <Text style={styles.buttonText}>Présent</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.categoryButton, selectedCategory === 'future' && styles.selectedButton]}
+                    onPress={() => setSelectedCategory('future')}
+                >
+                    <Text style={styles.buttonText}>Futur</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.listeContainer}>
+                <FlatList
+                    data={filteredEvents}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }: { item: Event }) => (
+                        <View style={styles.eventCard}>
+                            <View style={styles.imagePlaceholder} />
+
+                            <View style={styles.eventDetails}>
+                                <Text style={styles.eventName}>{item.nom}</Text>
+                                <Text style={styles.eventDate}>
+                                    {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
+                                </Text>
+                                <Text style={styles.eventParticipation}>
+                                    Participations : {item.participations || 0}
+                                </Text>
+                            </View>
+
+                            <TouchableOpacity onPress={() => deleteAdmin(item)}>
+                                <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                />
+            </View>
+            <TouchableOpacity style={styles.button} onPress={() => router.replace('./AddEventScreen')}>
+                <Text style={styles.buttonText}>Add Event</Text>
+            </TouchableOpacity>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    
     container: {
         flex: 1,
         justifyContent: 'center',
@@ -137,8 +159,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#56AEFF',
         paddingVertical: 15,
         paddingHorizontal: 40,
-        width:"70%",
-        left:"15%",
+        width: "70%",
+        left: "15%",
     },
     circleBlue1: {
         position: 'absolute',
@@ -199,7 +221,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         paddingHorizontal: 16,
         marginTop: "30%",
-        padding:20,
+        padding: 20,
     },
     categoryButton: {
         backgroundColor: '#ddd',
@@ -221,6 +243,7 @@ const styles = StyleSheet.create({
     },
     eventCard: {
         flexDirection: 'row',
+        alignItems: 'center',
         padding: 16,
         marginBottom: 16,
         borderRadius: 8,
@@ -261,6 +284,9 @@ const styles = StyleSheet.create({
     eventParticipation: {
         fontSize: 14,
         color: '#333',
+    },
+    deleteButton: {
+        marginLeft: 16,
     },
 });
 
