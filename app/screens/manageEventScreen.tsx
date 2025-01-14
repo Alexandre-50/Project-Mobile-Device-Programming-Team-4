@@ -61,7 +61,7 @@ const ManageEventScreen = () => {
                 setLoading(false);
             }
         };
-        
+
         fetchUserRole();
         fetchAllEvents();
     }, []);
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+        textAlign:'center'
     },
     listeContainer: {
         width: '100%',
