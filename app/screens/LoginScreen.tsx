@@ -40,7 +40,6 @@ const LoginScreen = () => {
                 setError('Incorrect ID.');
             }
         } catch (error) {
-            //console.error('Erreur lors de la connexion :', error);
             setError('Incorrect ID.');
         }
     };
