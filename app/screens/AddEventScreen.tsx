@@ -10,6 +10,8 @@ import {
   Platform,
   Modal,
   FlatList,
+  Alert,
+  Image,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
@@ -21,9 +23,10 @@ import {
   setDoc,
   getDoc,
   Timestamp,
+  
 } from "firebase/firestore";
 import { MaterialIcons } from "@expo/vector-icons";
-
+import * as ImagePicker from 'expo-image-picker';
 const AddEventScreen = () => {
   const [eventName, setEventName] = useState("");
   const [selectedAsso, setSelectedAsso] = useState("");
@@ -33,6 +36,7 @@ const AddEventScreen = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [error, setError] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -61,7 +65,47 @@ const AddEventScreen = () => {
       }
     }
   };
+  
 
+
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert('Permission refusée', 'Vous devez autoriser l’accès à la galerie pour choisir une image.');
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+  
+    // Vérifiez si result.assets existe avant d'y accéder
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+  
+
+  const takePhoto = async () => {
+    // Demander la permission pour accéder à la caméra
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert('Permission refusée', 'Vous devez autoriser l’accès à la caméra pour prendre une photo.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
   const handleAddEvent = async () => {
     if (!eventName || !selectedAsso || !percentage || !startDate || !endDate) {
       setError("Veuillez remplir tous les champs.");
@@ -188,6 +232,22 @@ const AddEventScreen = () => {
             setEndDate(selectedDate || endDate)
           }
         />
+        <View style={styles.ChooseImageContainer}>
+          {selectedImage ? (
+            <Image source={{ uri: selectedImage }} style={styles.Image} />
+          ) : (
+            <Text style={styles.PlaceHolderText}>Aucune image sélectionnée</Text>
+          )}
+
+          <View style={styles.ButtonContainer}>
+            <TouchableOpacity style={styles.buttonChoisirImage} onPress={takePhoto}>
+              <Text style={styles.modalButtonText}>Prendre une photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonChoisirImage} onPress={pickImage}>
+              <Text style={styles.modalButtonText}>Choisir depuis la galerie</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -265,7 +325,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   modalButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
   },
   backButton: {
@@ -294,16 +354,53 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     width: "90%",
+
+  },
+  buttonChoisirImage: {
+    backgroundColor: "#eee",
+    paddingVertical: 15,
+    paddingHorizontal: 2,
+    borderRadius: 10,
+    marginTop: 10,
+    width: "90%",
+    borderColor:'#ddd',
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 18,
+    color:"black",
+    fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+
   },
   errorText: {
     color: "red",
     marginBottom: 10,
+  },
+  ChooseImageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+
+  },
+  Image: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: 'black',
+
+  },
+  PlaceHolderText: {
+    fontSize: 16,
+    color: 'gray',
+    marginBottom: 20,
+  },
+  ButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '60%',
   },
 });
 

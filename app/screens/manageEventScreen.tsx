@@ -115,19 +115,19 @@ const ManageEventScreen = () => {
                     style={[styles.categoryButton, selectedCategory === 'past' && styles.selectedButton]}
                     onPress={() => setSelectedCategory('past')}
                 >
-                    <Text style={styles.buttonText}>Passé</Text>
+                    <Text style={styles.buttonText}>Past</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.categoryButton, selectedCategory === 'present' && styles.selectedButton]}
                     onPress={() => setSelectedCategory('present')}
                 >
-                    <Text style={styles.buttonText}>Présent</Text>
+                    <Text style={styles.buttonText}>Present</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.categoryButton, selectedCategory === 'future' && styles.selectedButton]}
                     onPress={() => setSelectedCategory('future')}
                 >
-                    <Text style={styles.buttonText}>Futur</Text>
+                    <Text style={styles.buttonText}>Future</Text>
                 </TouchableOpacity>
             </View>
 
@@ -135,27 +135,41 @@ const ManageEventScreen = () => {
                 <FlatList
                     data={filteredEvents}
                     keyExtractor={(item) => item.id}
-                    renderItem={({ item }: { item: Event }) => (
+                    renderItem={({ item }: { item: Event }) => {
+                    const isFutureEvent = item.startDate > new Date(); // Vérifie si la date de début est dans le futur
+
+                    return (
                         <View style={styles.eventCard}>
-                            <View style={styles.imagePlaceholder} />
+                        <View style={styles.imagePlaceholder} />
 
-                            <View style={styles.eventDetails}>
-                                <Text style={styles.eventName}>{item.nom}</Text>
-                                <Text style={styles.eventDate}>
-                                    {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
-                                </Text>
-                                <Text style={styles.eventParticipation}>
-                                    Participations : {item.participations || 0}
-                                </Text>
-                            </View>
-
-                            <TouchableOpacity onPress={() => deleteAdmin(item)}>
-                                <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
-                            </TouchableOpacity>
+                        <View style={styles.eventDetails}>
+                            <Text style={styles.eventName}>{item.nom}</Text>
+                            <Text style={styles.eventDate}>
+                            {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
+                            </Text>
+                            <Text style={styles.eventParticipation}>
+                            Participations : {item.participations || 0}
+                            </Text>
                         </View>
-                    )}
+
+                        {isFutureEvent ? (
+                            <TouchableOpacity onPress={() => deleteAdmin(item)}>
+                            <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
+                            </TouchableOpacity>
+                        ) : (
+                            <MaterialIcons
+                            style={[styles.deleteButton, { opacity: 0.5 }]} // Bouton grisé pour les événements passés
+                            name="delete"
+                            size={24}
+                            color="gray"
+                            />
+                        )}
+                        </View>
+                    );
+                    }}
                 />
-            </View>
+                </View>
+
             <TouchableOpacity style={styles.button} onPress={() => router.replace('./AddEventScreen')}>
                 <Text style={styles.buttonText}>Add Event</Text>
             </TouchableOpacity>

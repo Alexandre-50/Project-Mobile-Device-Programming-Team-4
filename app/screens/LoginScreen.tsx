@@ -80,6 +80,9 @@ const LoginScreen = () => {
                     />
                 </TouchableOpacity>
             </View>
+            <TouchableOpacity onPress={() => router.push('./ForgotPasswordScreen')}>
+                    <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
+                </TouchableOpacity>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>To connect</Text>
@@ -172,6 +175,12 @@ const styles = StyleSheet.create({
     errorText: {
         color: 'red',
         marginBottom: 10,
+    },
+    forgotPasswordText: {
+        marginTop: 10,
+        color: '#56AEFF',
+        textAlign: 'center',
+        fontSize: 16,
     },
     signupText: {
         marginTop: 20,
