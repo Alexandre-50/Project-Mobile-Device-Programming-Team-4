@@ -2,7 +2,7 @@ const {onRequest} = require("firebase-functions/v2/https");
 const {SecretManagerServiceClient} = require("@google-cloud/secret-manager");
 const client = new SecretManagerServiceClient();
 const {initializeApp} = require("firebase-admin/app");
-// const {getFirestore} = require("firebase-admin/firestore");
+const {getFirestore} = require("firebase-admin/firestore");
 
 initializeApp();
 
@@ -41,12 +41,10 @@ exports.getPaymentIntent = onRequest(async (req, res) => {
 
   try {
     const stripe = await getStripeClient();
-
     const ephemeralKey = await stripe.ephemeralKeys.create(
         {customer: "cus_RaP2WRVW7OVh9a"},
         {apiVersion: "2024-06-20"},
-    );
-    console.log("ephemeralKey créee avec succès !", ephemeralKey);
+      );
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: price * 100,
@@ -55,57 +53,51 @@ exports.getPaymentIntent = onRequest(async (req, res) => {
       automatic_payment_methods: {enabled: true},
       metadata: {productID},
     });
-    console.log("paymentIntent créee avec succès !", paymentIntent);
-    if (!paymentIntent.client_secret || !ephemeralKey.secret) {
-      console.error("Données manquantes dans la réponse Stripe");
-      return res.status(500).send("Erreur : Données Stripe manquantes.");
-    }
 
+    console.log("PaymentIntent créé avec succès.");
     res.json({
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
       customer: "cus_RaP2WRVW7OVh9a",
     });
-    console.log("Données de paiement envoyées avec succès !");
   } catch (error) {
     console.error("Erreur lors de la création du PaymentIntent:", error);
     res.status(500).send(`Erreur : ${error.message}`);
   }
 });
 
-// exports.getEphemeralSecret = onRequest(async (req, res) => {
-//   try {
-//     const stripe = await getStripeClient();
-//     const ephemeralKey = await stripe.ephemeralKeys.create(
-//         {customer: "cus_RaP2WRVW7OVh9a"},
-//         {apiVersion: "2024-06-20"},
-//     );
+exports.getEphemeralSecret = onRequest(async (req, res) => {
+  try {
+    const stripe = await getStripeClient();
+    const ephemeralKey = await stripe.ephemeralKeys.create(
+        {customer: "cus_RaP2WRVW7OVh9a"},
+        {apiVersion: "2024-06-20"},
+    );
 
-//     res.json({
-//       ephemeralKey: ephemeralKey.secret,
-//       customer: "cus_RaP2WRVW7OVh9a",
-//     });
-//   } catch (error) {
-//     res.status(500).send("Erreur lors de la génération de la clé éphémère.");
-//   }
-// });
+    res.json({
+      ephemeralKey: ephemeralKey.secret,
+      customer: "cus_RaP2WRVW7OVh9a",
+    });
+  } catch (error) {
+    res.status(500).send("Erreur lors de la génération de la clé éphémère.");
+  }
+});
 
-// exports.savePaymentToDatabase = onRequest(async (req, res) => {
-//   if (!req.body) {
-//     return res.status(400).send("Requête POST attendue
-//  avec un corps valide.");
-//   }
+exports.savePaymentToDatabase = onRequest(async (req, res) => {
+  if (!req.body) {
+    return res.status(400).send("Requête POST attendue avec un corps valide.");
+  }
 
-//   try {
-//     const db = getFirestore();
-//     await db.collection("purchases").add({
-//       productID: req.body.data.object.metadata.productID,
-//       timestamp: new Date(req.body.created * 1000),
-//       price: req.body.data.object.amount,
-//     });
-//     res.send("Enregistrement réussi.");
-//   } catch (error) {
-//     console.error("Erreur lors de l'enregistrement dans la BDD:", error);
-//     res.status(500).send("Erreur lors de l'enregistrement.");
-//   }
-// });
+  try {
+    const db = getFirestore();
+    await db.collection("purchases").add({
+      productID: req.body.data.object.metadata.productID,
+      timestamp: new Date(req.body.created * 1000),
+      price: req.body.data.object.amount,
+    });
+    res.send("Enregistrement réussi.");
+  } catch (error) {
+    console.error("Erreur lors de l'enregistrement dans la BDD:", error);
+    res.status(500).send("Erreur lors de l'enregistrement.");
+  }
+});
