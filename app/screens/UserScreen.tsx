@@ -43,6 +43,7 @@ const UserScreen = () => {
   const db = getFirestore();
   const router = useRouter();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  
 
   useEffect(() => {
     const fetchEvents = async () => {
