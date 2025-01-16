@@ -16,6 +16,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import { auth, db } from "../../firebaseConfig";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
   collection,
   getDocs,
@@ -27,6 +28,8 @@ import {
 } from "firebase/firestore";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+
 const AddEventScreen = () => {
   const [eventName, setEventName] = useState("");
   const [selectedAsso, setSelectedAsso] = useState("");
@@ -38,7 +41,34 @@ const AddEventScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const router = useRouter();
+  
 
+
+const uploadImage = async (uri: string): Promise<string> => {
+  try {
+    // Redimensionner l'image à 120x120
+    const resizedImage = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 120, height: 120 } }], // Redimensionnement
+      { compress: 1, format: ImageManipulator.SaveFormat.PNG } // Conserver la qualité et enregistrer en PNG
+    );
+
+    const response = await fetch(resizedImage.uri);
+    const blob = await response.blob();
+
+    const storage = getStorage();
+    const imageRef = ref(storage, `eventImages/${Date.now()}`); // Crée un chemin unique
+    await uploadBytes(imageRef, blob);
+
+    const imageUrl = await getDownloadURL(imageRef);
+    return imageUrl;
+  } catch (error) {
+    console.error("Erreur lors de l'upload de l'image :", error);
+    throw error;
+  }
+};
+
+  
   useEffect(() => {
     const fetchAssos = async () => {
       const assosCollection = await getDocs(collection(db, "assos"));
@@ -92,7 +122,7 @@ const AddEventScreen = () => {
     // Demander la permission pour accéder à la caméra
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (!permissionResult.granted) {
-      Alert.alert('Permission refusée', 'Vous devez autoriser l’accès à la caméra pour prendre une photo.');
+      Alert.alert('Permission refusée', 'Vous devez autoriser l accès à la caméra pour prendre une photo.');
       return;
     }
 
@@ -111,25 +141,31 @@ const AddEventScreen = () => {
       setError("Veuillez remplir tous les champs.");
       return;
     }
-
+  
     const percentValue = Number(percentage);
     if (percentValue < 0 || percentValue > 100) {
       setError("Le pourcentage doit être compris entre 0 et 100.");
       return;
     }
-
+  
     const currentDate = new Date();
     if (startDate <= currentDate) {
       setError("La date de début doit être postérieure à la date actuelle.");
       return;
     }
-
+  
     if (endDate <= startDate) {
       setError("La date de fin doit être postérieure à la date de début.");
       return;
     }
-
+  
     try {
+      let imageUrl = null;
+      if (selectedImage) {
+        // Télécharge l'image redimensionnée et obtient l'URL
+        imageUrl = await uploadImage(selectedImage);
+      }
+  
       const newEventRef = doc(collection(db, "evenements"));
       await setDoc(newEventRef, {
         nom: eventName,
@@ -138,13 +174,17 @@ const AddEventScreen = () => {
         startDate: Timestamp.fromDate(startDate),
         endDate: Timestamp.fromDate(endDate),
         participations: "0",
+        imageUrl: imageUrl, // Ajoute l'URL de l'image
       });
-
+  
       quitter();
     } catch (error) {
+      console.error("Erreur lors de l'ajout de l'événement :", error);
       setError("Erreur lors de l'ajout de l'événement.");
     }
   };
+  
+  
 
   return (
     <KeyboardAvoidingView

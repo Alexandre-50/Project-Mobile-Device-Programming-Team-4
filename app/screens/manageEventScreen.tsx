@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,Image, FlatList } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
@@ -11,6 +11,7 @@ interface Event {
     startDate: Date;
     endDate: Date;
     participations?: number;
+    imageUrl?: string;
 }
 
 const ManageEventScreen = () => {
@@ -51,6 +52,7 @@ const ManageEventScreen = () => {
                         startDate,
                         endDate,
                         participations: data.participations || 0,
+                        imageUrl: data.imageUrl || undefined,
                     };
                 });
 
@@ -132,42 +134,47 @@ const ManageEventScreen = () => {
             </View>
 
             <View style={styles.listeContainer}>
-                <FlatList
-                    data={filteredEvents}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }: { item: Event }) => {
-                    const isFutureEvent = item.startDate > new Date(); // Vérifie si la date de début est dans le futur
+            <FlatList
+    data={filteredEvents}
+    keyExtractor={(item) => item.id}
+    renderItem={({ item }: { item: Event }) => {
+        const isFutureEvent = item.startDate > new Date(); // Vérifie si la date de début est dans le futur
 
-                    return (
-                        <View style={styles.eventCard}>
-                        <View style={styles.imagePlaceholder} />
+        return (
+            <View style={styles.eventCard}>
+                {item.imageUrl ? (
+                    <Image source={{ uri: item.imageUrl }} style={styles.eventImage} />
+                ) : (
+                    <View style={styles.imagePlaceholder} />
+                )}
 
-                        <View style={styles.eventDetails}>
-                            <Text style={styles.eventName}>{item.nom}</Text>
-                            <Text style={styles.eventDate}>
-                            {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
-                            </Text>
-                            <Text style={styles.eventParticipation}>
-                            Participations : {item.participations || 0}
-                            </Text>
-                        </View>
+                <View style={styles.eventDetails}>
+                    <Text style={styles.eventName}>{item.nom}</Text>
+                    <Text style={styles.eventDate}>
+                        {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
+                    </Text>
+                    <Text style={styles.eventParticipation}>
+                        Participations : {item.participations || 0}
+                    </Text>
+                </View>
 
-                        {isFutureEvent ? (
-                            <TouchableOpacity onPress={() => deleteAdmin(item)}>
-                            <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
-                            </TouchableOpacity>
-                        ) : (
-                            <MaterialIcons
-                            style={[styles.deleteButton, { opacity: 0.5 }]} // Bouton grisé pour les événements passés
-                            name="delete"
-                            size={24}
-                            color="gray"
-                            />
-                        )}
-                        </View>
-                    );
-                    }}
-                />
+                {isFutureEvent ? (
+                    <TouchableOpacity onPress={() => deleteAdmin(item)}>
+                        <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
+                    </TouchableOpacity>
+                ) : (
+                    <MaterialIcons
+                        style={[styles.deleteButton, { opacity: 0.5 }]} // Bouton grisé pour les événements passés
+                        name="delete"
+                        size={24}
+                        color="gray"
+                    />
+                )}
+            </View>
+        );
+    }}
+/>
+
                 </View>
 
             <TouchableOpacity style={styles.button} onPress={() => router.replace('./AddEventScreen')}>
@@ -301,6 +308,16 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
     },
+    eventImage: {
+        width: 60, // Taille de l'image
+        height: 60,
+        borderRadius: 4,
+        marginRight: 16,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        backgroundColor: '#f9f9f9', // Couleur de fond pour éviter des moments de chargement vides
+    },
+    
     eventName: {
         fontSize: 16,
         fontWeight: 'bold',
