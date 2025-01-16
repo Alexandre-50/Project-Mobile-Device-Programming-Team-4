@@ -73,6 +73,34 @@ exports.getPaymentIntent = onRequest(async (req, res) => {
   }
 });
 
+
+exports.createStripeCustomer = onRequest(async (req, res) => {
+  const {email, name, address} = req.body;
+
+  if (!email || !name) {
+    return res.status(400).send("Paramètres manquants : email et nom requis.");
+  }
+
+  try {
+    const stripe = await getStripeClient();
+
+    // Création d'un client Stripe
+    const customer = await stripe.customers.create({
+      email,
+      name,
+      address,
+    });
+
+    console.log("Client Stripe créé avec succès :", customer.id);
+
+    // Retourner l'ID du client Stripe au frontend
+    res.status(200).send({customerId: customer.id});
+  } catch (error) {
+    console.error("Erreur lors de la création du client Stripe :", error);
+    res.status(500).send("Erreur lors de la création du client Stripe.");
+  }
+});
+
 // exports.getEphemeralSecret = onRequest(async (req, res) => {
 //   try {
 //     const stripe = await getStripeClient();
