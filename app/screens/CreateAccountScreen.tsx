@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet,KeyboardAvoidingView,ScrollView,Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebaseConfig';
@@ -7,66 +7,94 @@ import { doc, setDoc } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
 const CreateAccountScreen = () => {
-	const [CodePostal,setCodePostal] = useState('');
-    const [Ville,setVille] = useState('');
-    const [Pays,setPays] = useState('');
-    const [Adresse, setAdresse] = useState('');
-    const [Prenom, setPrenom] = useState('');
-    const [nom, setNom] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [secureTextEntry, setSecureTextEntry] = useState(true);
-    const [secureTextEntry1, setSecureTextEntry1] = useState(true);
-    const router = useRouter();
-    const handleBackPress = () => {
-      if (router.canGoBack()) {
-        router.back(); // Revenir à la page précédente s'il y a une page dans l'historique
-      } else {
-        router.push('./LoginScreen'); // Sinon, redirigez explicitement vers la page de connexion
+  const [CodePostal, setCodePostal] = useState('');
+  const [Ville, setVille] = useState('');
+  const [Pays, setPays] = useState('');
+  const [Adresse, setAdresse] = useState('');
+  const [Prenom, setPrenom] = useState('');
+  const [nom, setNom] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [secureTextEntry1, setSecureTextEntry1] = useState(true);
+  const router = useRouter();
+
+  const handleBackPress = () => {
+    if (router.canGoBack()) {
+      router.back(); // Revenir à la page précédente
+    } else {
+      router.push('./LoginScreen'); // Rediriger vers la page de connexion
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs.');
+      return;
+    }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Créer un client Stripe
+      const stripeResponse = await fetch('https://createstripecustomer-exzkoelgwq-uc.a.run.app', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user.email,
+          name: `${Prenom} ${nom}`,
+          address: {
+            line1: Adresse,
+            postal_code: CodePostal,
+            city: Ville,
+            country: Pays,
+          },
+        }),
+      });
+
+      if (!stripeResponse.ok) {
+        throw new Error('Erreur lors de la création du client Stripe.');
       }
-    };
-    
-    const handleSignUp = async () => {
-        if (password !== confirmPassword) {
-            setError('Les mots de passe ne correspondent pas.');
-            return;
-        }
-        if (!email || !password) {
-            setError('Veuillez remplir tous les champs.');
-            return;
-        }
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email,password);
-            const user = userCredential.user;
 
-            await setDoc(doc(db, 'users', user.uid), {
-                email: user.email,
-                nom: nom,
-                prenom: Prenom,
-                adresse: Adresse,
-                codePostal: CodePostal,
-                ville: Ville,
-                pays: Pays,
-                role: 'user'
-            });
+      const stripeData = await stripeResponse.json();
+      const customerId = stripeData.customerId;
 
-            router.push('./LoginScreen');
-        } catch (error) {
-            if (error instanceof Error && "code" in error) {
-                if (error.code === 'auth/invalid-email') {
-                    setError('L\'adresse e-mail n\'est pas valide.');
-                } else if (error.code === 'auth/email-already-in-use') {
-                    setError('Cette adresse e-mail est déjà utilisée.');
-                } else {
-                    setError('Erreur lors de la création du compte.');
-                }
-            } else {
-                setError('Une erreur inconnue est survenue.');
-            }
+      // Sauvegarder les informations dans Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        nom: nom,
+        prenom: Prenom,
+        adresse: Adresse,
+        codePostal: CodePostal,
+        ville: Ville,
+        pays: Pays,
+        role: 'user',
+        stripeCustomerId: customerId, // Ajouter l'ID Stripe
+      });
+
+      router.push('./LoginScreen');
+    } catch (error) {
+      if (error instanceof Error && 'code' in error) {
+        if (error.code === 'auth/invalid-email') {
+          setError("L'adresse e-mail n'est pas valide.");
+        } else if (error.code === 'auth/email-already-in-use') {
+          setError('Cette adresse e-mail est déjà utilisée.');
+        } else {
+          setError('Erreur lors de la création du compte.');
         }
-    };
+      } else {
+        setError('Une erreur inconnue est survenue.');
+      }
+    }
+  };
     return (
           
           <View style={styles.container}> 
