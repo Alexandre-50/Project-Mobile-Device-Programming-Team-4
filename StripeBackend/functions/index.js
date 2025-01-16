@@ -2,7 +2,6 @@ const {onRequest} = require("firebase-functions/v2/https");
 const {SecretManagerServiceClient} = require("@google-cloud/secret-manager");
 const client = new SecretManagerServiceClient();
 const {initializeApp} = require("firebase-admin/app");
-// const {getFirestore} = require("firebase-admin/firestore");
 
 initializeApp();
 
@@ -27,52 +26,53 @@ const getStripeClient = async () => {
 };
 
 exports.getPaymentIntent = onRequest(async (req, res) => {
-  const price = req.body.price;
-  const currency = req.body.currency;
-  const productID = req.body.productID;
+  const {price, currency, productID, customerId} = req.body;
 
-  if (!price || !currency || !productID) {
+  if (!price || !currency || !productID || !customerId) {
     return res.status(400).send("Requête invalide. Paramètres manquants.");
   }
 
   if (currency !== "eur") {
-    return res.status(400).send("Devise non supportée");
+    return res.status(400).send("Devise non supportée.");
   }
 
   try {
     const stripe = await getStripeClient();
 
+    // Créer une clé éphémère pour le client spécifique
     const ephemeralKey = await stripe.ephemeralKeys.create(
-        {customer: "cus_RaP2WRVW7OVh9a"},
+        {customer: customerId},
         {apiVersion: "2024-06-20"},
     );
-    console.log("ephemeralKey créee avec succès !", ephemeralKey);
+    console.log("Ephemeral key créée avec succès : ", ephemeralKey.id);
 
+    // Créer un PaymentIntent pour ce client
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: price * 100,
+      amount: price * 100, // Convertir en centimes
       currency: currency,
-      customer: "cus_RaP2WRVW7OVh9a",
+      customer: customerId,
       automatic_payment_methods: {enabled: true},
       metadata: {productID},
     });
-    console.log("paymentIntent créee avec succès !", paymentIntent);
+    console.log("PaymentIntent créé avec succès : ", paymentIntent.id);
+
     if (!paymentIntent.client_secret || !ephemeralKey.secret) {
-      console.error("Données manquantes dans la réponse Stripe");
+      console.error("Données manquantes dans la réponse Stripe.");
       return res.status(500).send("Erreur : Données Stripe manquantes.");
     }
 
+    // Retourner les informations nécessaires au frontend
     res.json({
       paymentIntent: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
-      customer: "cus_RaP2WRVW7OVh9a",
+      customer: customerId,
     });
     console.log("Données de paiement envoyées avec succès !");
   } catch (error) {
-    console.error("Erreur lors de la création du PaymentIntent:", error);
+    console.error("Erreur lors de la création du PaymentIntent :", error);
     res.status(500).send(`Erreur : ${error.message}`);
   }
 });
-
 
 exports.createStripeCustomer = onRequest(async (req, res) => {
   const {email, name, address} = req.body;

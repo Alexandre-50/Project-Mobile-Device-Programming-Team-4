@@ -43,7 +43,7 @@ const CreateAccountScreen = () => {
       const user = userCredential.user;
 
       // Créer un client Stripe
-      const stripeResponse = await fetch('https://us-central1-kit4cause-b7a41.cloudfunctions.net/createStripeCustomer', {
+      const stripeResponse = await fetch('https://createstripecustomer-exzkoelgwq-uc.a.run.app', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

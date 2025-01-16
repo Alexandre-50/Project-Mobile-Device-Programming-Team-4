@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, doc, getDoc, getDocs, updateDoc, FieldValue, increment } from "firebase/firestore";
 import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
-import * as Linking from 'expo-linking';
+import * as Linking from "expo-linking";
 import { publicKey } from "../../constants/StripePublicKey";
 
 interface EventData {
@@ -20,7 +20,7 @@ interface EventData {
 
 const UserScreen = () => {
   const [eventOfTheDay, setEventOfTheDay] = useState<EventData | null>(null);
-  const [nextEvent, setNextEvent] = useState<EventData | null>(null);
+  const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
   const db = getFirestore();
@@ -53,11 +53,6 @@ const UserScreen = () => {
           (event) => event.startDate <= today && today <= event.endDate
         );
         setEventOfTheDay(todayEvent || null);
-
-        const upcomingEvent = eventList
-          .filter((event) => event.startDate > today)
-          .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())[0];
-        setNextEvent(upcomingEvent || null);
       } catch (error) {
         console.error("Erreur lors de la récupération des événements :", error);
       } finally {
@@ -67,6 +62,25 @@ const UserScreen = () => {
 
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    // Récupérer l'ID client Stripe de l'utilisateur connecté
+    const fetchStripeCustomerId = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists() && userDocSnap.data().stripeCustomerId) {
+        setStripeCustomerId(userDocSnap.data().stripeCustomerId);
+      } else {
+        console.error("ID client Stripe introuvable pour cet utilisateur.");
+      }
+    };
+
+    fetchStripeCustomerId();
+  }, [auth]);
 
   const calculateTicketsLeft = (participations: number) => {
     if (participations < 100) return 100 - participations;
@@ -94,61 +108,91 @@ const UserScreen = () => {
     return 10;
   };
 
-const handlePayment = async () => {
-    if (!eventOfTheDay) return;
+  const updateEventParticipation = async (eventId: string) => {
+  try {
+    const eventRef = doc(db, "evenements", eventId);
+    await updateDoc(eventRef, {
+      participations: increment(1), // Incrémente la participation
+    });
+    console.log("Participation ajoutée avec succès à l'événement :", eventId);
+
+    // Mettre à jour localement l'événement
+    setEventOfTheDay((prevEvent) => {
+      if (prevEvent) {
+        return { ...prevEvent, participations: prevEvent.participations + 1 };
+      }
+      return prevEvent;
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour des participations :", error);
+    Alert.alert("Erreur", "Impossible de mettre à jour les participations.");
+  }
+};
+
+  const handlePayment = async () => {
+    if (!eventOfTheDay || !stripeCustomerId) {
+      Alert.alert("Erreur", "Impossible de récupérer l'ID client Stripe.");
+      return;
+    }
 
     try {
-        const price = calculatePrice(eventOfTheDay.participations);
-        console.log("Envoi au backend: ", { price, currency: 'eur', productID: eventOfTheDay.id });
+      const price = calculatePrice(eventOfTheDay.participations);
+      console.log("Envoi au backend : ", {
+        price,
+        currency: "eur",
+        productID: eventOfTheDay.id,
+        customerId: stripeCustomerId,
+      });
 
-        const response = await fetch(
-            'https://getpaymentintent-exzkoelgwq-uc.a.run.app',
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    price: price,
-                    currency: 'eur',
-                    productID: eventOfTheDay.id
-                })
-            }
-        );
-        const data = await response.json();
-        console.log("Données reçues depuis le backend : ", data);
+      const response = await fetch("https://getpaymentintent-exzkoelgwq-uc.a.run.app", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          price,
+          currency: "eur",
+          productID: eventOfTheDay.id,
+          customerId: stripeCustomerId,
+        }),
+      });
+      const data = await response.json();
+      console.log("Données reçues depuis le backend : ", data);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
-        const returnURL = Linking.createURL('app/screens/UserScreen');
+      const returnURL = Linking.createURL("app/screens/UserScreen");
 
-        const { error } = await initPaymentSheet({
-            merchantDisplayName: "Loterie Solidaire",
-            paymentIntentClientSecret: data.paymentIntent,
-            customerEphemeralKeySecret: data.ephemeralKey,
-            customerId: data.customer,
-            returnURL: returnURL
-        });
+      const { error } = await initPaymentSheet({
+        merchantDisplayName: "Loterie Solidaire",
+        paymentIntentClientSecret: data.paymentIntent,
+        customerEphemeralKeySecret: data.ephemeralKey,
+        customerId: stripeCustomerId,
+        returnURL,
+      });
 
-        if (error) {
-            Alert.alert("Erreur", error.message);
-            return;
-        }
+      if (error) {
+        Alert.alert("Erreur", error.message);
+        return;
+      }
 
-        const { error: paymentError } = await presentPaymentSheet();
+      const { error: paymentError } = await presentPaymentSheet();
 
-        if (paymentError) {
-            Alert.alert("Paiement échoué", paymentError.message);
-        } else {
-            Alert.alert("Succès", "Votre paiement a été effectué avec succès!");
-        }
+      if (paymentError) {
+        Alert.alert("Paiement échoué", paymentError.message);
+      } else {
+        Alert.alert("Succès", "Votre paiement a été effectué avec succès !");
+        await updateEventParticipation(eventOfTheDay.id); // Mise à jour des participations
+      }
+
+      
     } catch (error) {
-        console.error("Erreur lors du paiement :", error);
-        Alert.alert("Erreur", "Une erreur est survenue lors du paiement.");
+      console.error("Erreur lors du paiement :", error);
+      Alert.alert("Erreur", "Une erreur est survenue lors du paiement.");
     }
-};
+  };
 
   if (loading) {
     return (
