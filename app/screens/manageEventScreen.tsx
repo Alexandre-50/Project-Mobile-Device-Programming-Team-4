@@ -145,50 +145,57 @@ const ManageEventScreen = () => {
 
             <View style={styles.listeContainer}>
             <FlatList
-    data={filteredEvents}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }: { item: Event }) => {
-        const isFutureEvent = item.startDate > new Date(); // Vérifie si la date de début est dans le futur
+                data={filteredEvents}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }: { item: Event }) => {
+                    const isFutureEvent = item.startDate > new Date(); // Vérifie si c'est un événement futur
 
-        return (
-            <View style={styles.eventCard}>
-                <Image
-                            style={styles.eventImage}
-                            source={{
-                                uri: item.imageUrl || require('../../assets/images/app/DefaultImageEvent.png'),
-                            }}
-                        />
+                    return (
+                        <View style={styles.eventCard}>
+                            <Image
+                                style={styles.eventImage}
+                                source={{
+                                    uri: item.imageUrl || require('../../assets/images/app/DefaultImageEvent.png'),
+                                }}
+                            />
+                            <View style={styles.eventDetails}>
+                                <Text style={styles.eventName}>{item.nom}</Text>
+                                <Text style={styles.eventDate}>
+                                    {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
+                                </Text>
+                                <Text style={styles.eventParticipation}>
+                                    Participations : {item.participations || 0}
+                                </Text>
+                            </View>
 
-                
+                            <View style={styles.actions}>
+                                {isFutureEvent && (
+                                    <>
+                                        <TouchableOpacity
+                                        onPress={() => router.push(`/screens/EditEventScreen?id=${item.id}`)}
+                                        style={styles.editButton}
+                                        >
+                                        <MaterialIcons name="edit" size={14} style={styles.actions} />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => deleteAdmin(item)} style={styles.deleteButton}>
+                                            <MaterialIcons name="delete" size={24} color="red" />
+                                        </TouchableOpacity>
+                                    </>
+                                )}
+                                {!isFutureEvent && (
+                                    <MaterialIcons
+                                        style={[styles.deleteButton, { opacity: 0.5 }]} // Bouton grisé pour les événements passés
+                                        name="delete"
+                                        size={24}
+                                        color="gray"
+                                    />
+                                )}
+                            </View>
+                        </View>
+                    );
+                }}
+            />
 
-
-
-                <View style={styles.eventDetails}>
-                    <Text style={styles.eventName}>{item.nom}</Text>
-                    <Text style={styles.eventDate}>
-                        {item.startDate.toLocaleDateString()} - {item.endDate.toLocaleDateString()}
-                    </Text>
-                    <Text style={styles.eventParticipation}>
-                        Participations : {item.participations || 0}
-                    </Text>
-                </View>
-
-                {isFutureEvent ? (
-                    <TouchableOpacity onPress={() => deleteAdmin(item)}>
-                        <MaterialIcons style={styles.deleteButton} name="delete" size={24} color="red" />
-                    </TouchableOpacity>
-                ) : (
-                    <MaterialIcons
-                        style={[styles.deleteButton, { opacity: 0.5 }]} // Bouton grisé pour les événements passés
-                        name="delete"
-                        size={24}
-                        color="gray"
-                    />
-                )}
-            </View>
-        );
-    }}
-/>
 
                 </View>
 
@@ -246,6 +253,19 @@ const styles = StyleSheet.create({
         borderRadius: 75,
         backgroundColor: 'rgba(0,122,255,0.5)',
     },
+    actions: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        alignItems: "center",
+        marginTop: 10,
+      },
+      editButton: {
+        marginRight: 0,
+        backgroundColor: "#FFD700",
+        paddingBottom: 10,
+        paddingHorizontal: 10,
+        borderRadius: 8,
+      },
     circleBlue4: {
         position: 'absolute',
         top: -60,
@@ -348,7 +368,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     deleteButton: {
-        marginLeft: 16,
+        marginLeft: 5,
     },
 });
 

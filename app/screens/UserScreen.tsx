@@ -46,7 +46,7 @@ const UserScreen = () => {
             endDate: new Date(data.endDate.seconds * 1000),
             participations: data.participations || 0,
             pourcentAsso: data.pourcentAsso || 0,
-            imageUrl: data.imageUrl || "https://picsum.photos/200/300",
+            imageUrl: data.imageUrl || null,
           };
           return event;
         });
@@ -341,9 +341,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
   },
-  eventInfo: {
-    marginBottom: 20,
-  },
+  
   eventRemainingTime: {
     fontSize: 16,
     color: "#333",
@@ -354,11 +352,7 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
-  eventDate: {
-    fontSize: 16,
-    color: "#555",
-    marginBottom: 4,
-  },
+  
   eventFunds: {
     fontSize: 14,
     color: "#333",
@@ -383,10 +377,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  noEventText: {
-    fontSize: 16,
-    color: "#555",
-  },
+  
   eventImage: {
     width: 60, // Taille de l'image
     height: 60,
