@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,Image, FlatList,ActivityIndicator } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, getDocs, collection, doc, deleteDoc } from 'firebase/firestore';
+
 
 interface Event {
     id: string;
@@ -23,7 +24,16 @@ const ManageEventScreen = () => {
     const auth = getAuth();
     const db = getFirestore();
     const router = useRouter();
-
+    const [imageLoaded, setImageLoaded] = useState(false);
+    useEffect(() => {
+        const preloadImages = async () => {
+            const imageUrls = events.map(event => event.imageUrl).filter(Boolean);
+            await Promise.all(imageUrls.map(url => Image.prefetch(url!)));
+        };
+    
+        preloadImages();
+    }, [events]);
+    
     useEffect(() => {
         const fetchUserRole = async () => {
             const user = auth.currentUser;
@@ -142,11 +152,16 @@ const ManageEventScreen = () => {
 
         return (
             <View style={styles.eventCard}>
-                {item.imageUrl ? (
-                    <Image source={{ uri: item.imageUrl }} style={styles.eventImage} />
-                ) : (
-                    <View style={styles.imagePlaceholder} />
-                )}
+                <Image
+                            style={styles.eventImage}
+                            source={{
+                                uri: item.imageUrl || require('../../assets/images/app/DefaultImageEvent.png'),
+                            }}
+                        />
+
+                
+
+
 
                 <View style={styles.eventDetails}>
                     <Text style={styles.eventName}>{item.nom}</Text>

@@ -93,7 +93,7 @@ const ManageAdminScreen = () => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccount')}>
+            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('./ProfileAccountScreen')}>
                 <FontAwesome name="user" size={24} color="white" />
             </TouchableOpacity>
             <View style={styles.circleBlue1}></View>

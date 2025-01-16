@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert,Image } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
@@ -16,6 +16,7 @@ interface EventData {
   endDate: Date;
   participations: number;
   pourcentAsso: number;
+  imageUrl?: string | null;
 }
 
 const UserScreen = () => {
@@ -45,6 +46,7 @@ const UserScreen = () => {
             endDate: new Date(data.endDate.seconds * 1000),
             participations: data.participations || 0,
             pourcentAsso: data.pourcentAsso || 0,
+            imageUrl: data.imageUrl || "https://picsum.photos/200/300",
           };
           return event;
         });
@@ -239,6 +241,11 @@ const UserScreen = () => {
                     </Text>
                   }
                 </Text>
+                <Image
+                source={{ uri: eventOfTheDay?.imageUrl || require('../../assets/images/app/DefaultImageEvent.png') }}
+                style={styles.eventImage}
+                />
+
                 <Text style={styles.ticketsLeft}>
                   Nombre de tickets restants avant augmentation :{" "}
                   {eventOfTheDay
@@ -380,5 +387,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
   },
+  eventImage: {
+    width: 60, // Taille de l'image
+    height: 60,
+    borderRadius: 4,
+    marginRight: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f9f9f9', // Couleur de fond pour éviter des moments de chargement vides
+},
 });
 export default UserScreen;
