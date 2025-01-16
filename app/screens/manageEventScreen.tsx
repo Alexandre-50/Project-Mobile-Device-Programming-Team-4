@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
       },
       editButton: {
-        marginRight: 0,
+        marginRight: 10,
         backgroundColor: "#FFD700",
         paddingBottom: 10,
         paddingHorizontal: 10,

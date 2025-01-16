@@ -92,7 +92,48 @@ const EditEventScreen = () => {
       throw error;
     }
   };
-
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert(
+        "Permission refusée",
+        "Vous devez autoriser l'accès à la galerie pour choisir une image."
+      );
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+  
+    if (!result.canceled && result.assets?.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+  
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert(
+        "Permission refusée",
+        "Vous devez autoriser l'accès à la caméra pour prendre une photo."
+      );
+      return;
+    }
+  
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+  
+    if (!result.canceled && result.assets?.length > 0) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
+  
   const handleSaveChanges = async () => {
     if (!event.nom || !event.asso || !event.pourcentAsso || !event.startDate || !event.endDate) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
@@ -215,17 +256,29 @@ const EditEventScreen = () => {
             />
 
 
-        <View style={styles.ChooseImageContainer}>
-          {selectedImage ? (
-            <Image source={{ uri: selectedImage }} style={styles.Image} />
-          ) : (
-            <Text style={styles.PlaceHolderText}>Aucune image sélectionnée</Text>
-          )}
+        
 
-          <TouchableOpacity style={styles.buttonChoisirImage} onPress={async () => setSelectedImage(null)}>
-            <Text>Supprimer l'image actuelle</Text>
-          </TouchableOpacity>
+        <View style={styles.ChooseImageContainer}>
+        {selectedImage ? (
+            <Image source={{ uri: selectedImage }} style={styles.Image} />
+        ) : (
+            <Text style={styles.PlaceHolderText}>Aucune image sélectionnée</Text>
+        )}
+
+        <View style={styles.ButtonContainer}>
+            {/* Bouton pour prendre une photo */}
+            <TouchableOpacity style={styles.buttonChoisirImage} onPress={takePhoto}>
+            <Text style={styles.modalButtonText}>Prendre une photo</Text>
+            </TouchableOpacity>
+
+            {/* Bouton pour choisir une image depuis la galerie */}
+            <TouchableOpacity style={styles.buttonChoisirImage} onPress={pickImage}>
+            <Text style={styles.modalButtonText}>Choisir depuis la galerie</Text>
+            </TouchableOpacity>
         </View>
+        </View>
+
+        
 
         <TouchableOpacity style={styles.button} onPress={handleSaveChanges}>
           <Text style={styles.buttonText}>Enregistrer les modifications</Text>
@@ -246,7 +299,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
       position: "absolute",
-      top: 40,
+      top: 20,
       left: 20,
       padding: 10,
     },
@@ -256,6 +309,25 @@ const styles = StyleSheet.create({
       marginBottom: 20,
       color: "#333",
     },
+    ButtonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginLeft: -35,
+        width: "100%",
+        marginTop: 10,
+      },
+      buttonChoisirImage: {
+        backgroundColor: "#56AEFF",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        marginHorizontal: 5,
+      },
+      modalButtonText: {
+        color: "white",
+        fontSize: 14,
+        textAlign: "center",
+      },
     input: {
       width: "90%",
       padding: 15,
@@ -304,10 +376,7 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       backgroundColor: "#f9f9f9",
     },
-    modalButtonText: {
-      fontSize: 14,
-      textAlign: "center",
-    },
+    
     ChooseImageContainer: {
       justifyContent: "center",
       alignItems: "center",
@@ -327,15 +396,7 @@ const styles = StyleSheet.create({
       color: "gray",
       marginBottom: 20,
     },
-    buttonChoisirImage: {
-      backgroundColor: "#eee",
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      borderRadius: 10,
-      marginTop: 10,
-      borderColor: "#ddd",
-      borderWidth: 1,
-    },
+    
     loader: {
       flex: 1,
       justifyContent: "center",
