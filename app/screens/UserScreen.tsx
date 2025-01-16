@@ -148,7 +148,7 @@ const UserScreen = () => {
       await updateDoc(eventRef, {
         participations: increment(1), // Incrémente la participation
       });
-      console.log("Participation ajoutée avec succès à l'événement :", eventId);
+      console.log("Participation ajoutée avec succès à l'événement :", eventId,"");
 
       // Mettre à jour localement l'événement
       setEventOfTheDay((prevEvent) => {
@@ -262,11 +262,19 @@ const UserScreen = () => {
         >
           <FontAwesome name="user" size={24} color="white" />
         </TouchableOpacity>
+        
         <View style={styles.headerContainer}>
           <Text style={styles.title}>
             {eventOfTheDay ? eventOfTheDay.nom : "Événement inconnu"}
           </Text>
-
+          <Image
+            source={{
+              uri:
+                eventOfTheDay?.imageUrl ||
+                require("../../assets/images/app/DefaultImageEvent.png"),
+            }}
+            style={styles.eventImage}
+          />
           <Text style={styles.eventRemainingTime}>
             Fin dans{" "}
             {eventOfTheDay
@@ -290,20 +298,13 @@ const UserScreen = () => {
               </Text>
             }
           </Text>
-          <Image
-            source={{
-              uri:
-                eventOfTheDay?.imageUrl ||
-                require("../../assets/images/app/DefaultImageEvent.png"),
-            }}
-            style={styles.eventImage}
-          />
+          
 
           <Text style={styles.ticketsLeft}>
-            Nombre de tickets restants avant augmentation :{" "}
+            Plus que{" "}
             {eventOfTheDay
               ? calculateTicketsLeft(eventOfTheDay.participations)
-              : 0}
+              : 0} tickets à ce prix
           </Text>
           <TouchableOpacity
             style={styles.participateButton}
@@ -315,6 +316,12 @@ const UserScreen = () => {
               €
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity 
+                style={styles.ancienEvenementButton} 
+                onPress={() => router.push('./UserPastEventScreen')}
+            >
+                <Text style={styles.ancienEvenementText}>Past Event</Text>
+            </TouchableOpacity>
         </View>
       </View>
     </StripeProvider>
@@ -372,16 +379,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    top: 50,
+    top: 30,
     transform: [{ translateX: -30 }],
     left: "50%",
   },
   headerContainer: {
-    backgroundColor: "#f9f9f9",
     padding: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
+
     alignItems: "center",
     width: "90%",
   },
@@ -394,26 +398,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
     color: "black",
+    paddingVertical: 20,
+    marginTop:"15%",
   },
 
   eventRemainingTime: {
     fontSize: 16,
     color: "#333",
-    marginBottom: 8,
+    marginBottom: 18,
   },
   eventParticipation: {
     fontSize: 16,
     color: "#333",
-    marginBottom: 8,
+    marginBottom: 18,
   },
 
   eventFunds: {
     fontSize: 14,
     color: "#333",
-    marginBottom: 8,
+    marginBottom: 18,
     textAlign: "center",
   },
   ticketsLeft: {
@@ -425,20 +431,34 @@ const styles = StyleSheet.create({
   participateButton: {
     backgroundColor: "#007bff",
     padding: 10,
-    borderRadius: 10,
     width: "80%",
     alignItems: "center",
+  },
+  ancienEvenementButton: {
+    backgroundColor: "white",
+    borderColor: "#007bff",
+    borderWidth: 2,
+    padding: 10,
+    width: "80%",
+    alignItems: "center",
+    marginTop: 10,
   },
   participateButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
+  ancienEvenementText: {
+    color: "#007bff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
 
   eventImage: {
-    width: 60, // Taille de l'image
-    height: 60,
-    borderRadius: 4,
+    width: 100, // Taille de l'image
+    height: 140,
+   
     marginRight: 16,
     borderWidth: 1,
     borderColor: "#ccc",
