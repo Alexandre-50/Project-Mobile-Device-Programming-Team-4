@@ -39,11 +39,11 @@ const UserScreen = () => {
   const [eventOfTheDay, setEventOfTheDay] = useState<EventData | null>(null);
   const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [nextEvent, setNextEvent] = useState<EventData | null>(null);
   const auth = getAuth();
   const db = getFirestore();
   const router = useRouter();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -55,7 +55,7 @@ const UserScreen = () => {
 
         const eventList: EventData[] = eventDocsSnap.docs.map((doc) => {
           const data = doc.data();
-          const event: EventData = {
+          return {
             id: doc.id,
             nom: data.nom || "Nom inconnu",
             asso: data.asso || "Association inconnue",
@@ -65,13 +65,19 @@ const UserScreen = () => {
             pourcentAsso: data.pourcentAsso || 0,
             imageUrl: data.imageUrl || null,
           };
-          return event;
         });
 
+        // Trouver l'événement en cours
         const todayEvent = eventList.find(
           (event) => event.startDate <= today && today <= event.endDate
         );
         setEventOfTheDay(todayEvent || null);
+
+        // Trouver le prochain événement
+        const futureEvents = eventList
+          .filter((event) => event.startDate > today)
+          .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+        setNextEvent(futureEvents[0] || null);
       } catch (error) {
         console.error("Erreur lors de la récupération des événements :", error);
       } finally {
@@ -148,7 +154,11 @@ const UserScreen = () => {
       await updateDoc(eventRef, {
         participations: increment(1), // Incrémente la participation
       });
-      console.log("Participation ajoutée avec succès à l'événement :", eventId,"");
+      console.log(
+        "Participation ajoutée avec succès à l'événement :",
+        eventId,
+        ""
+      );
 
       // Mettre à jour localement l'événement
       setEventOfTheDay((prevEvent) => {
@@ -262,67 +272,88 @@ const UserScreen = () => {
         >
           <FontAwesome name="user" size={24} color="white" />
         </TouchableOpacity>
-        
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>
-            {eventOfTheDay ? eventOfTheDay.nom : "Événement inconnu"}
-          </Text>
-          <Image
-            source={{
-              uri:
-                eventOfTheDay?.imageUrl ||
-                require("../../assets/images/app/DefaultImageEvent.png"),
-            }}
-            style={styles.eventImage}
-          />
-          <Text style={styles.eventRemainingTime}>
-            Fin dans{" "}
-            {eventOfTheDay
-              ? calculateTimeRemaining(eventOfTheDay.endDate)
-              : "--"}
-          </Text>
-          <Text style={styles.eventParticipation}>
-            Actuellement : {eventOfTheDay ? eventOfTheDay.participations : 0}{" "}
-            participations
-          </Text>
-
-          <Text style={styles.eventFunds}>
-            {eventOfTheDay ? eventOfTheDay.pourcentAsso : 0}% des fonds de cet
-            évènement sera reversé à l'association{" : "}
-            {
-              <Text style={{ fontWeight: "bold" }}>
-                {" "}
-                {eventOfTheDay
-                  ? eventOfTheDay.asso
-                  : "Association inconnue"}{" "}
-              </Text>
-            }
-          </Text>
-          
-
-          <Text style={styles.ticketsLeft}>
-            Plus que{" "}
-            {eventOfTheDay
-              ? calculateTicketsLeft(eventOfTheDay.participations)
-              : 0} tickets à ce prix
-          </Text>
-          <TouchableOpacity
-            style={styles.participateButton}
-            onPress={handlePayment}
-          >
-            <Text style={styles.participateButtonText}>
-              Participer -{" "}
-              {eventOfTheDay ? calculatePrice(eventOfTheDay.participations) : 1}
-              €
+        {eventOfTheDay ? (
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>
+              {eventOfTheDay ? eventOfTheDay.nom : "Événement inconnu"}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-                style={styles.ancienEvenementButton} 
-                onPress={() => router.push('./UserPastEventScreen')}
+            <Image
+              source={{
+                uri:
+                  eventOfTheDay?.imageUrl ||
+                  require("../../assets/images/app/DefaultImageEvent.png"),
+              }}
+              style={styles.eventImage}
+            />
+            <Text style={styles.eventRemainingTime}>
+              Fin dans{" "}
+              {eventOfTheDay
+                ? calculateTimeRemaining(eventOfTheDay.endDate)
+                : "--"}
+            </Text>
+            <Text style={styles.eventParticipation}>
+              Actuellement : {eventOfTheDay ? eventOfTheDay.participations : 0}{" "}
+              participations
+            </Text>
+
+            <Text style={styles.eventFunds}>
+              {eventOfTheDay ? eventOfTheDay.pourcentAsso : 0}% des fonds de cet
+              évènement sera reversé à l'association{" : "}
+              {
+                <Text style={{ fontWeight: "bold" }}>
+                  {" "}
+                  {eventOfTheDay
+                    ? eventOfTheDay.asso
+                    : "Association inconnue"}{" "}
+                </Text>
+              }
+            </Text>
+
+            <Text style={styles.ticketsLeft}>
+              Plus que{" "}
+              {eventOfTheDay
+                ? calculateTicketsLeft(eventOfTheDay.participations)
+                : 0}{" "}
+              tickets à ce prix
+            </Text>
+            <TouchableOpacity
+              style={styles.participateButton}
+              onPress={handlePayment}
             >
-                <Text style={styles.ancienEvenementText}>Past Event</Text>
+              <Text style={styles.participateButtonText}>
+                Participer -{" "}
+                {eventOfTheDay
+                  ? calculatePrice(eventOfTheDay.participations)
+                  : 1}
+                €
+              </Text>
             </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.ancienEvenementButton}
+              onPress={() => router.push("./UserPastEventScreen")}
+            >
+              <Text style={styles.ancienEvenementText}>Past Event</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.headerContainer}>
+            <Text style={styles.noEventText}>Pas d'évènement en cours</Text>
+            {nextEvent ? (
+              <Text style={styles.nextEventText}>
+                Prochain évènement le {nextEvent.startDate.toLocaleDateString()}{" "}
+                à {nextEvent.startDate.toLocaleTimeString()}
+              </Text>
+            ) : (
+              <Text style={styles.nextEventText}>Aucun évènement prévu.</Text>
+            )}
+            <TouchableOpacity
+              style={styles.ancienEvenementButton}
+              onPress={() => router.push("./UserPastEventScreen")}
+            >
+              <Text style={styles.ancienEvenementText}>Past Event</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </StripeProvider>
   );
@@ -379,7 +410,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    top: 30,
+    top: 50,
     transform: [{ translateX: -30 }],
     left: "50%",
   },
@@ -402,9 +433,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "black",
     paddingVertical: 20,
-    marginTop:"15%",
+    marginTop: "15%",
+    textAlign: "center",
   },
-
+  noEventText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#d9534f",
+    marginBottom: 10,
+  },
+  nextEventText: {
+    fontSize: 16,
+    color: "#333",
+    textAlign: "center",
+  },
   eventRemainingTime: {
     fontSize: 16,
     color: "#333",
@@ -429,15 +471,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   participateButton: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#56AEFF",
     padding: 10,
     width: "80%",
     alignItems: "center",
   },
   ancienEvenementButton: {
     backgroundColor: "white",
-    borderColor: "#007bff",
-    borderWidth: 2,
+    borderColor: "#56AEFF",
+    borderWidth: 4,
     padding: 10,
     width: "80%",
     alignItems: "center",
@@ -449,17 +491,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   ancienEvenementText: {
-    color: "#007bff",
+    color: "#56AEFF",
     fontSize: 16,
     fontWeight: "bold",
   },
-
-
   eventImage: {
     width: 100, // Taille de l'image
     height: 140,
-   
-    marginRight: 16,
+    alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
     backgroundColor: "#f9f9f9", // Couleur de fond pour éviter des moments de chargement vides
