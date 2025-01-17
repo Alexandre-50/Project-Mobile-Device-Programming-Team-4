@@ -84,39 +84,42 @@ const PastEventsScreen = () => {
             where("eventId", "==", event.id)
           );
           const participationSnap = await getDocs(participationQuery);
-
+  
           const participants = participationSnap.docs.map((doc) => doc.data().userId);
-
+  
           if (participants.length === 0) {
             console.log(`Aucun participant pour l'événement ${event.nom}`);
-            continue;
+  
+            // Mettre à jour le gagnant dans la base de données avec "Aucun Gagnant"
+            const eventRef = doc(db, "evenements", event.id);
+            await updateDoc(eventRef, { winner: "Aucun Gagnant" });
+            continue; // Passer à l'événement suivant
           }
-
+  
           // Tirage au sort
           const randomIndex = Math.floor(Math.random() * participants.length);
           const winnerId = participants[randomIndex];
-
+  
           // Récupérer les informations du gagnant
           const userRef = doc(db, "users", winnerId);
           const userSnap = await getDoc(userRef);
-
+  
           if (!userSnap.exists()) {
             console.error(`Utilisateur introuvable pour l'ID : ${winnerId}`);
             continue;
           }
-
+  
           const userData = userSnap.data();
           const winnerName = `${userData.prenom} ${userData.nom}`;
           const winnerEmail = userData.email;
-
+  
           // Mettre à jour le gagnant dans la base de données
           const eventRef = doc(db, "evenements", event.id);
           await updateDoc(eventRef, { winner: winnerName });
-
+  
           console.log(`Gagnant désigné pour l'événement ${event.nom}: ${winnerName}`);
-
-          // Envoyer un e-mail au gagnant
-          await sendEmailToWinner(winnerEmail, winnerName, event.nom);
+  
+          // Vous pouvez également ajouter ici l'envoi d'un e-mail au gagnant
         } catch (error) {
           console.error(
             `Erreur lors du tirage au sort pour l'événement ${event.nom}:`,
@@ -125,7 +128,7 @@ const PastEventsScreen = () => {
         }
       }
     }
-
+  
     // Recharger les événements après mise à jour
     const updatedEventsSnap = await getDocs(collection(db, "evenements"));
     const updatedEventList: EventData[] = updatedEventsSnap.docs
@@ -144,37 +147,12 @@ const PastEventsScreen = () => {
         };
       })
       .filter((event) => event.endDate < new Date());
-
+  
     setPastEvents(updatedEventList);
   };
+  
 
-  const sendEmailToWinner = async (
-    email: string,
-    name: string,
-    eventName: string
-  ) => {
-    try {
-      const response = await fetch("https://mail.google.com/mail/u/1/#inbox?compose=new", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: email,
-          subject: "Félicitations ! Vous êtes le gagnant !",
-          message: `Bonjour ${name},\n\nVous avez été désigné comme gagnant de l'événement "${eventName}". Félicitations !\n\nMerci de votre participation.\n\nL'équipe.`,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'envoi de l'e-mail");
-      }
-
-      console.log(`E-mail envoyé avec succès à ${email}`);
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de l'e-mail :", error);
-    }
-  };
+ 
 
   return (
     <View style={styles.container}>
