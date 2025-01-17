@@ -19,7 +19,10 @@ import {
   updateDoc,
   increment,
   addDoc,
-  onSnapshot, query, where, orderBy
+  onSnapshot,
+  query,
+  where,
+  orderBy,
 } from "firebase/firestore";
 import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
 import * as Linking from "expo-linking";
@@ -48,71 +51,67 @@ const UserScreen = () => {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
 
+  useEffect(() => {
+    const fetchEvents = () => {
+      try {
+        const eventCollectionRef = collection(db, "evenements");
+        const q = query(eventCollectionRef, orderBy("startDate")); // Trier par date de début
 
-  
+        // Écouter en temps réel
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const today = new Date();
 
-useEffect(() => {
-  const fetchEvents = () => {
-    try {
-      const eventCollectionRef = collection(db, "evenements");
-      const q = query(eventCollectionRef, orderBy("startDate")); // Trier par date de début
+          const eventList: EventData[] = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              nom: data.nom || "Nom inconnu",
+              asso: data.asso || "Association inconnue",
+              startDate: new Date(data.startDate.seconds * 1000),
+              endDate: new Date(data.endDate.seconds * 1000),
+              participations: data.participations || 0,
+              pourcentAsso: data.pourcentAsso || 0,
+              imageUrl: data.imageUrl || null,
+            };
+          });
 
-      // Écouter en temps réel
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const today = new Date();
+          // Trouver l'événement en cours
+          const todayEvent = eventList.find(
+            (event) => event.startDate <= today && today <= event.endDate
+          );
+          setEventOfTheDay(todayEvent || null);
 
-        const eventList: EventData[] = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            nom: data.nom || "Nom inconnu",
-            asso: data.asso || "Association inconnue",
-            startDate: new Date(data.startDate.seconds * 1000),
-            endDate: new Date(data.endDate.seconds * 1000),
-            participations: data.participations || 0,
-            pourcentAsso: data.pourcentAsso || 0,
-            imageUrl: data.imageUrl || null,
-          };
+          // Trouver le prochain événement
+          const futureEvents = eventList
+            .filter((event) => event.startDate > today)
+            .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
+          setNextEvent(futureEvents[0] || null);
+
+          // Vérifier si l'utilisateur a participé
+          if (todayEvent && auth.currentUser) {
+            const userId = auth.currentUser.uid;
+            const participationRef = collection(db, "participations");
+            const qParticipation = query(
+              participationRef,
+              where("eventId", "==", todayEvent.id),
+              where("userId", "==", userId)
+            );
+
+            onSnapshot(qParticipation, (participationSnapshot) => {
+              setHasParticipated(!participationSnapshot.empty);
+            });
+          }
         });
 
-        // Trouver l'événement en cours
-        const todayEvent = eventList.find(
-          (event) => event.startDate <= today && today <= event.endDate
-        );
-        setEventOfTheDay(todayEvent || null);
+        // Nettoyer l'écoute
+        return () => unsubscribe();
+      } catch (error) {
+        console.error("Rrror retrieving events  :", error);
+      }
+    };
 
-        // Trouver le prochain événement
-        const futureEvents = eventList
-          .filter((event) => event.startDate > today)
-          .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-        setNextEvent(futureEvents[0] || null);
-
-        // Vérifier si l'utilisateur a participé
-        if (todayEvent && auth.currentUser) {
-          const userId = auth.currentUser.uid;
-          const participationRef = collection(db, "participations");
-          const qParticipation = query(
-            participationRef,
-            where("eventId", "==", todayEvent.id),
-            where("userId", "==", userId)
-          );
-
-          onSnapshot(qParticipation, (participationSnapshot) => {
-            setHasParticipated(!participationSnapshot.empty);
-          });
-        }
-      });
-
-      // Nettoyer l'écoute
-      return () => unsubscribe();
-    } catch (error) {
-      console.error("Rrror retrieving events  :", error);
-    }
-  };
-
-  fetchEvents();
-}, []);
-
+    fetchEvents();
+  }, []);
 
   useEffect(() => {
     // Récupérer l'ID client Stripe de l'utilisateur connecté
@@ -147,7 +146,7 @@ useEffect(() => {
       await addDoc(participationRef, {
         userId,
         eventId,
-        createdAt: new Date(), 
+        createdAt: new Date(),
       });
       console.log("Participation succesfully added :", userId, eventId);
     } catch (error) {
@@ -157,34 +156,30 @@ useEffect(() => {
   };
   useEffect(() => {
     if (!eventOfTheDay || !eventOfTheDay.endDate) return;
-  
+
     const interval = setInterval(() => {
       const now = new Date();
       const diff = eventOfTheDay.endDate.getTime() - now.getTime();
-  
+
       if (diff <= 0) {
         clearInterval(interval);
-        setTimeRemaining(null); 
+        setTimeRemaining(null);
       } else {
         setTimeRemaining(calculateTimeRemaining(diff));
       }
     }, 1000);
-  
+
     return () => clearInterval(interval);
   }, [eventOfTheDay]);
-  
-  
-  
 
   const calculateTimeRemaining = (diff: number) => {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-  
+
     return `${days}j ${hours}h ${minutes}m ${seconds}s`;
   };
-  
 
   const calculatePrice = (participations: number) => {
     if (participations < 100) return 1;
@@ -198,7 +193,7 @@ useEffect(() => {
     try {
       const eventRef = doc(db, "evenements", eventId);
       await updateDoc(eventRef, {
-        participations: increment(1), 
+        participations: increment(1),
       });
       console.log(
         "Participation ajoutée avec succès à l'événement :",
@@ -296,8 +291,6 @@ useEffect(() => {
     }
   };
 
-  
-
   return (
     <StripeProvider publishableKey={publicKey}>
       <View style={styles.container}>
@@ -328,14 +321,14 @@ useEffect(() => {
               End in {timeRemaining || "--"}
             </Text>
 
-
             <Text style={styles.eventParticipation}>
               Currently : {eventOfTheDay ? eventOfTheDay.participations : 0}{" "}
               participations
             </Text>
 
             <Text style={styles.eventFunds}>
-              {eventOfTheDay ? eventOfTheDay.pourcentAsso : 0}% of the funds will be donated to the association{" : "}
+              {eventOfTheDay ? eventOfTheDay.pourcentAsso : 0}% of the funds
+              will be donated to the association{" : "}
               {
                 <Text style={{ fontWeight: "bold" }}>
                   {" "}
@@ -354,28 +347,25 @@ useEffect(() => {
               tickets left at this price
             </Text>
 
-
             {hasParticipated ? (
               <Text style={styles.participationMessage}>
                 You have already participated in the event.
               </Text>
             ) : (
               <TouchableOpacity
-              style={styles.participateButton}
-              onPress={handlePayment}
-            >
-              <Text style={styles.participateButtonText}>
-                Participate -{" "}
-                {eventOfTheDay
-                  ? calculatePrice(eventOfTheDay.participations)
-                  : 1}
-                €
-              </Text>
-            </TouchableOpacity>
+                style={styles.participateButton}
+                onPress={handlePayment}
+              >
+                <Text style={styles.participateButtonText}>
+                  Participate -{" "}
+                  {eventOfTheDay
+                    ? calculatePrice(eventOfTheDay.participations)
+                    : 1}
+                  €
+                </Text>
+              </TouchableOpacity>
             )}
 
-
-            
             <TouchableOpacity
               style={styles.ancienEvenementButton}
               onPress={() => router.push("./UserPastEventScreen")}
@@ -388,8 +378,8 @@ useEffect(() => {
             <Text style={styles.noEventText}>No event currently</Text>
             {nextEvent ? (
               <Text style={styles.nextEventText}>
-                Next event {nextEvent.startDate.toLocaleDateString()}{" "}
-                at {nextEvent.startDate.toLocaleTimeString()}
+                Next event {nextEvent.startDate.toLocaleDateString()} at{" "}
+                {nextEvent.startDate.toLocaleTimeString()}
               </Text>
             ) : (
               <Text style={styles.nextEventText}>No event planned.</Text>
@@ -458,7 +448,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    top: 20,
+    top: 50,
     transform: [{ translateX: -30 }],
     left: "50%",
   },

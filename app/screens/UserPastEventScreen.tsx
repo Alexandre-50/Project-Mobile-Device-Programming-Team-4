@@ -61,7 +61,7 @@ const PastEventsScreen = () => {
               winner: data.winner || "0",
             };
           })
-          .filter((event) => event.endDate < now); 
+          .filter((event) => event.endDate < now);
 
         setPastEvents(eventList);
         checkAndDrawWinners(eventList);
@@ -96,7 +96,7 @@ const PastEventsScreen = () => {
 
             const eventRef = doc(db, "evenements", event.id);
             await updateDoc(eventRef, { winner: "Aucun Gagnant" });
-            continue; 
+            continue;
           }
 
           const randomIndex = Math.floor(Math.random() * participants.length);
@@ -115,12 +115,11 @@ const PastEventsScreen = () => {
           const winnerEmail = userData.email;
 
           const eventRef = doc(db, "evenements", event.id);
-          await updateDoc(eventRef, { winner: winnerId });
+          await updateDoc(eventRef, { winner: winnerName });
 
           console.log(
             `Winner designated for the event ${event.nom}: ${winnerName}`
           );
-
         } catch (error) {
           console.error(
             `Error during the draw for the event ${event.nom}:`,
@@ -215,7 +214,7 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "white",
   },
-  
+
   profileButton: {
     backgroundColor: "#56AEFF",
     borderRadius: 50,
