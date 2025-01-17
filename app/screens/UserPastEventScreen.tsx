@@ -58,10 +58,10 @@ const PastEventsScreen = () => {
               participations: data.participations || 0,
               pourcentAsso: data.pourcentAsso || 0,
               imageUrl: data.imageUrl || null,
-              winner: data.winner || "0", // Par défaut, on considère "0" comme non défini
+              winner: data.winner || "0",
             };
           })
-          .filter((event) => event.endDate < now); // Filtrer uniquement les événements passés
+          .filter((event) => event.endDate < now); 
 
         setPastEvents(eventList);
         checkAndDrawWinners(eventList);
@@ -80,7 +80,6 @@ const PastEventsScreen = () => {
     for (const event of events) {
       if (event.winner === "0") {
         try {
-          // Récupérer tous les participants de l'événement
           const participationRef = collection(db, "participations");
           const participationQuery = query(
             participationRef,
@@ -95,22 +94,19 @@ const PastEventsScreen = () => {
           if (participants.length === 0) {
             console.log(`Aucun participant pour l'événement ${event.nom}`);
 
-            // Mettre à jour le gagnant dans la base de données avec "Aucun Gagnant"
             const eventRef = doc(db, "evenements", event.id);
             await updateDoc(eventRef, { winner: "Aucun Gagnant" });
-            continue; // Passer à l'événement suivant
+            continue; 
           }
 
-          // Tirage au sort
           const randomIndex = Math.floor(Math.random() * participants.length);
           const winnerId = participants[randomIndex];
 
-          // Récupérer les informations du gagnant
           const userRef = doc(db, "users", winnerId);
           const userSnap = await getDoc(userRef);
 
           if (!userSnap.exists()) {
-            console.error(`Utilisateur introuvable pour l'ID : ${winnerId}`);
+            console.error(`User not found for the ID : ${winnerId}`);
             continue;
           }
 
@@ -118,33 +114,30 @@ const PastEventsScreen = () => {
           const winnerName = `${userData.prenom} ${userData.nom}`;
           const winnerEmail = userData.email;
 
-          // Mettre à jour le gagnant dans la base de données
           const eventRef = doc(db, "evenements", event.id);
           await updateDoc(eventRef, { winner: winnerId });
 
           console.log(
-            `Gagnant désigné pour l'événement ${event.nom}: ${winnerName}`
+            `Winner designated for the event ${event.nom}: ${winnerName}`
           );
 
-          // Vous pouvez également ajouter ici l'envoi d'un e-mail au gagnant
         } catch (error) {
           console.error(
-            `Erreur lors du tirage au sort pour l'événement ${event.nom}:`,
+            `Error during the draw for the event ${event.nom}:`,
             error
           );
         }
       }
     }
 
-    // Recharger les événements après mise à jour
     const updatedEventsSnap = await getDocs(collection(db, "evenements"));
     const updatedEventList: EventData[] = updatedEventsSnap.docs
       .map((doc) => {
         const data = doc.data();
         return {
           id: doc.id,
-          nom: data.nom || "Nom inconnu",
-          asso: data.asso || "Association inconnue",
+          nom: data.nom || "Unknown name",
+          asso: data.asso || "Unknown association",
           startDate: new Date(data.startDate.seconds * 1000),
           endDate: new Date(data.endDate.seconds * 1000),
           participations: data.participations || 0,
@@ -200,13 +193,13 @@ const PastEventsScreen = () => {
                 Participations : {item.participations}
               </Text>
               <Text style={styles.eventFunds}>
-                {item.pourcentAsso}% des fonds reversés à : {item.asso}
+                {item.pourcentAsso}% of the funds go to : {item.asso}
               </Text>
               <TextInput
                 value={item.winner || ""}
                 editable={false}
                 style={styles.winnerInput}
-                placeholder="Nom du gagnant"
+                placeholder="Winner name"
               />
             </View>
           </View>
@@ -222,6 +215,7 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "white",
   },
+  
   profileButton: {
     backgroundColor: "#56AEFF",
     borderRadius: 50,
@@ -281,7 +275,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "850%",
     top: "15%",
-    backgroundColor: "white",
+    backgroundColor: "transparent",
     padding: 16,
   },
   eventCard: {

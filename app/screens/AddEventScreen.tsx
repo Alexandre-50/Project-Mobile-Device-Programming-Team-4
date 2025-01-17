@@ -46,18 +46,17 @@ const AddEventScreen = () => {
 
 const uploadImage = async (uri: string): Promise<string> => {
   try {
-    // Redimensionner l'image à 120x120
     const resizedImage = await ImageManipulator.manipulateAsync(
       uri,
-      [{ resize: { width: 120, height: 120 } }], // Redimensionnement
-      { compress: 1, format: ImageManipulator.SaveFormat.PNG } // Conserver la qualité et enregistrer en PNG
+      [{ resize: { width: 120, height: 120 } }], 
+      { compress: 1, format: ImageManipulator.SaveFormat.PNG } 
     );
 
     const response = await fetch(resizedImage.uri);
     const blob = await response.blob();
 
     const storage = getStorage();
-    const imageRef = ref(storage, `eventImages/${Date.now()}`); // Crée un chemin unique
+    const imageRef = ref(storage, `eventImages/${Date.now()}`);
     await uploadBytes(imageRef, blob);
 
     const imageUrl = await getDownloadURL(imageRef);
@@ -111,7 +110,6 @@ const uploadImage = async (uri: string): Promise<string> => {
       quality: 1,
     });
   
-    // Vérifiez si result.assets existe avant d'y accéder
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setSelectedImage(result.assets[0].uri);
     }
@@ -119,7 +117,6 @@ const uploadImage = async (uri: string): Promise<string> => {
   
 
   const takePhoto = async () => {
-    // Demander la permission pour accéder à la caméra
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (!permissionResult.granted) {
       Alert.alert('Permission refusée', 'Vous devez autoriser l accès à la caméra pour prendre une photo.');
@@ -162,7 +159,6 @@ const uploadImage = async (uri: string): Promise<string> => {
     try {
       let imageUrl = null;
       if (selectedImage) {
-        // Télécharge l'image redimensionnée et obtient l'URL
         imageUrl = await uploadImage(selectedImage);
       }
   
@@ -174,7 +170,7 @@ const uploadImage = async (uri: string): Promise<string> => {
         startDate: Timestamp.fromDate(startDate),
         endDate: Timestamp.fromDate(endDate),
         participations: "0",
-        imageUrl: imageUrl, // Ajoute l'URL de l'image
+        imageUrl: imageUrl, 
         winner: "0",
       });
   

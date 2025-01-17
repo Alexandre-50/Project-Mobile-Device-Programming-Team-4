@@ -177,7 +177,7 @@ const ManageEventScreen = () => {
           data={filteredEvents}
           keyExtractor={(item) => item.id}
           renderItem={({ item }: { item: Event }) => {
-            const isFutureEvent = item.startDate > new Date(); // Vérifie si c'est un événement futur
+            const isFutureEvent = item.startDate > new Date(); 
 
             return (
               <View style={styles.eventCard}>
@@ -225,7 +225,7 @@ const ManageEventScreen = () => {
                   )}
                   {!isFutureEvent && (
                     <MaterialIcons
-                      style={[styles.deleteButton, { opacity: 0.5 }]} // Bouton grisé pour les événements passés
+                      style={[styles.deleteButton, { opacity: 0.5 }]} 
                       name="delete"
                       size={24}
                       color="gray"

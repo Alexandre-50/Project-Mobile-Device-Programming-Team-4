@@ -20,7 +20,7 @@ const HomeScreen = () => {
             />
             <Text style={styles.title}>Participate, win, support !</Text>
             <Text style={styles.description}>
-                Each month, try to win a Jersey rare or signed ! To take part, join our solidarity lottery: the first people to sign up benefit from reduced rates, and part of the proceeds are donated to our partner associations. A unique chance for you to win, while supporting a good cause.
+                Each week, try to win a Jersey rare or signed ! To take part, join our solidarity lottery: the first people to sign up benefit from reduced rates, and part of the proceeds are donated to our partner associations. A unique chance for you to win, while supporting a good cause.
             </Text>
             <TouchableOpacity style={styles.button} onPress={handlePress}>
                 <Text style={styles.buttonText}>Let's go !</Text>

@@ -28,7 +28,7 @@ const AddAssoScreen = () => {
     }, []);
 
     const handleAddAsso = async () => {
-        if (!name || !description || !link) {
+        if (!name || !description ) {
             setError('Please fill all the fields.');
             return;
         }
@@ -36,7 +36,6 @@ const AddAssoScreen = () => {
             await addDoc(collection(db, 'assos'), {
                 nom: name,
                 description: description,
-                lien: link
             });
             router.push('./ManageAssosScreen');
         } catch (error) {

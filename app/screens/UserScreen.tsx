@@ -106,7 +106,7 @@ useEffect(() => {
       // Nettoyer l'écoute
       return () => unsubscribe();
     } catch (error) {
-      console.error("Erreur lors de la récupération des événements :", error);
+      console.error("Rrror retrieving events  :", error);
     }
   };
 
@@ -147,12 +147,12 @@ useEffect(() => {
       await addDoc(participationRef, {
         userId,
         eventId,
-        createdAt: new Date(), // Ajouter une date pour suivre le moment de la participation
+        createdAt: new Date(), 
       });
-      console.log("Participation ajoutée avec succès :", userId, eventId);
+      console.log("Participation succesfully added :", userId, eventId);
     } catch (error) {
-      console.error("Erreur lors de l'ajout de la participation :", error);
-      Alert.alert("Erreur", "Impossible d'enregistrer la participation.");
+      console.error("Error while adding participation :", error);
+      Alert.alert("Error", "Impossible to register participation.");
     }
   };
   useEffect(() => {
@@ -164,7 +164,7 @@ useEffect(() => {
   
       if (diff <= 0) {
         clearInterval(interval);
-        setTimeRemaining(null); // L'événement est terminé
+        setTimeRemaining(null); 
       } else {
         setTimeRemaining(calculateTimeRemaining(diff));
       }
@@ -198,7 +198,7 @@ useEffect(() => {
     try {
       const eventRef = doc(db, "evenements", eventId);
       await updateDoc(eventRef, {
-        participations: increment(1), // Incrémente la participation
+        participations: increment(1), 
       });
       console.log(
         "Participation ajoutée avec succès à l'événement :",
@@ -206,7 +206,6 @@ useEffect(() => {
         ""
       );
 
-      // Mettre à jour localement l'événement
       setEventOfTheDay((prevEvent) => {
         if (prevEvent) {
           return { ...prevEvent, participations: prevEvent.participations + 1 };
@@ -315,7 +314,7 @@ useEffect(() => {
         {eventOfTheDay ? (
           <View style={styles.headerContainer}>
             <Text style={styles.title}>
-              {eventOfTheDay ? eventOfTheDay.nom : "Événement inconnu"}
+              {eventOfTheDay ? eventOfTheDay.nom : "Unknown event"}
             </Text>
             <Image
               source={{
@@ -326,40 +325,39 @@ useEffect(() => {
               style={styles.eventImage}
             />
             <Text style={styles.eventRemainingTime}>
-              Fin dans {timeRemaining || "--"}
+              End in {timeRemaining || "--"}
             </Text>
 
 
             <Text style={styles.eventParticipation}>
-              Actuellement : {eventOfTheDay ? eventOfTheDay.participations : 0}{" "}
+              Currently : {eventOfTheDay ? eventOfTheDay.participations : 0}{" "}
               participations
             </Text>
 
             <Text style={styles.eventFunds}>
-              {eventOfTheDay ? eventOfTheDay.pourcentAsso : 0}% des fonds de cet
-              évènement sera reversé à l'association{" : "}
+              {eventOfTheDay ? eventOfTheDay.pourcentAsso : 0}% of the funds will be donated to the association{" : "}
               {
                 <Text style={{ fontWeight: "bold" }}>
                   {" "}
                   {eventOfTheDay
                     ? eventOfTheDay.asso
-                    : "Association inconnue"}{" "}
+                    : "Unknown association"}{" "}
                 </Text>
               }
             </Text>
 
             <Text style={styles.ticketsLeft}>
-              Plus que{" "}
+              Only{" "}
               {eventOfTheDay
                 ? calculateTicketsLeft(eventOfTheDay.participations)
                 : 0}{" "}
-              tickets à ce prix
+              tickets left at this price
             </Text>
 
 
             {hasParticipated ? (
               <Text style={styles.participationMessage}>
-                Tu as déjà participé à l'événement.
+                You have already participated in the event.
               </Text>
             ) : (
               <TouchableOpacity
@@ -367,7 +365,7 @@ useEffect(() => {
               onPress={handlePayment}
             >
               <Text style={styles.participateButtonText}>
-                Participer -{" "}
+                Participate -{" "}
                 {eventOfTheDay
                   ? calculatePrice(eventOfTheDay.participations)
                   : 1}
@@ -387,14 +385,14 @@ useEffect(() => {
           </View>
         ) : (
           <View style={styles.headerContainer}>
-            <Text style={styles.noEventText}>Pas d'évènement en cours</Text>
+            <Text style={styles.noEventText}>No event currently</Text>
             {nextEvent ? (
               <Text style={styles.nextEventText}>
-                Prochain évènement le {nextEvent.startDate.toLocaleDateString()}{" "}
-                à {nextEvent.startDate.toLocaleTimeString()}
+                Next event {nextEvent.startDate.toLocaleDateString()}{" "}
+                at {nextEvent.startDate.toLocaleTimeString()}
               </Text>
             ) : (
-              <Text style={styles.nextEventText}>Aucun évènement prévu.</Text>
+              <Text style={styles.nextEventText}>No event planned.</Text>
             )}
             <TouchableOpacity
               style={styles.ancienEvenementButton}
@@ -460,7 +458,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
-    top: 50,
+    top: 20,
     transform: [{ translateX: -30 }],
     left: "50%",
   },

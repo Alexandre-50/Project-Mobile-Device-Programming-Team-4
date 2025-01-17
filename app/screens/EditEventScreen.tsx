@@ -35,7 +35,7 @@ const EditEventScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const router = useRouter();
-  const { id } = useLocalSearchParams(); // Récupère l'ID de l'événement depuis les paramètres
+  const { id } = useLocalSearchParams(); 
   const storage = getStorage();
 
   useEffect(() => {
@@ -242,23 +242,23 @@ const EditEventScreen = () => {
 
         <Text>Start date and time</Text>
         <DateTimePicker
-            value={new Date(event.startDate)} // Assurez-vous que la valeur est un objet Date valide
+            value={new Date(event.startDate)} 
             mode="datetime"
             display="default"
             onChange={(pickerEvent, selectedDate) => {
                 if (selectedDate) {
-                setEvent({ ...event, startDate: selectedDate }); // Mettez à jour startDate uniquement si une date est sélectionnée
+                setEvent({ ...event, startDate: selectedDate });
                 }
             }}
             />
 
             <DateTimePicker
-            value={new Date(event.endDate)} // Assurez-vous que la valeur est un objet Date valide
+            value={new Date(event.endDate)} 
             mode="datetime"
             display="default"
             onChange={(pickerEvent, selectedDate) => {
                 if (selectedDate) {
-                setEvent({ ...event, endDate: selectedDate }); // Mettez à jour endDate uniquement si une date est sélectionnée
+                setEvent({ ...event, endDate: selectedDate }); 
                 }
             }}
             />
@@ -274,12 +274,12 @@ const EditEventScreen = () => {
         )}
 
         <View style={styles.ButtonContainer}>
-            {/* Bouton pour prendre une photo */}
+            {}
             <TouchableOpacity style={styles.buttonChoisirImage} onPress={takePhoto}>
             <Text style={styles.modalButtonText}>Take a picture</Text>
             </TouchableOpacity>
 
-            {/* Bouton pour choisir une image depuis la galerie */}
+            {}
             <TouchableOpacity style={styles.buttonChoisirImage} onPress={pickImage}>
             <Text style={styles.modalButtonText}>Choose a picture</Text>
             </TouchableOpacity>

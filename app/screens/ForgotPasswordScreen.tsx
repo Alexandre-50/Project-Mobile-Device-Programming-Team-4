@@ -23,7 +23,7 @@ const ForgotPasswordScreen = () => {
                 'E-mail Send',
                 'A link to reset your password has been sent to your email address.'
             );
-            router.push('./LoginScreen'); // Redirige vers la page de connexion
+            router.push('./LoginScreen'); 
         } catch (error) {
             console.error('Error during password reset:', error);
             setError("Impossible to send an e-mail. Check your e-mail adress.");

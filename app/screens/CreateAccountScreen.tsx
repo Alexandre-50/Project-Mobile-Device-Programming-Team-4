@@ -23,9 +23,9 @@ const CreateAccountScreen = () => {
 
   const handleBackPress = () => {
     if (router.canGoBack()) {
-      router.back(); // Revenir à la page précédente
+      router.back(); 
     } else {
-      router.push('./LoginScreen'); // Rediriger vers la page de connexion
+      router.push('./LoginScreen'); 
     }
   };
 
@@ -42,7 +42,6 @@ const CreateAccountScreen = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Créer un client Stripe
       const stripeResponse = await fetch('https://createstripecustomer-exzkoelgwq-uc.a.run.app', {
         method: 'POST',
         headers: {
@@ -67,7 +66,6 @@ const CreateAccountScreen = () => {
       const stripeData = await stripeResponse.json();
       const customerId = stripeData.customerId;
 
-      // Sauvegarder les informations dans Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         nom: nom,
@@ -77,7 +75,7 @@ const CreateAccountScreen = () => {
         ville: Ville,
         pays: Pays,
         role: 'user',
-        stripeCustomerId: customerId, // Ajouter l'ID Stripe
+        stripeCustomerId: customerId, 
       });
 
       router.push('./LoginScreen');
