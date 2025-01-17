@@ -54,7 +54,7 @@ const LoginScreen = () => {
             <View style={styles.circleBlue2}></View>
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View>
-            <Text style={styles.title}>Connexion</Text>
+            <Text style={styles.title}>Connection</Text>
             <TextInput
                 placeholder="e-mail adress"
                 placeholderTextColor="gray"
