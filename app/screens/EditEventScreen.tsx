@@ -180,25 +180,33 @@ const EditEventScreen = () => {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+    <View style={styles.container}>
+      
+
+        
+      <View style={styles.circleBlue1}></View> 
+      <View style={styles.circleBlue2}></View> 
+      <View style={styles.circleBlue3}></View>
+      <View style={styles.circleBlue4}></View> 
+      <Text style={styles.title}>Edit Event</Text>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-
-        <Text style={styles.title}>Modifier l'événement</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        
 
         <TextInput
-          placeholder="Nom de l'événement"
+          placeholder="Event Name"
           placeholderTextColor="gray"
           value={event.nom}
           onChangeText={(text) => setEvent({ ...event, nom: text })}
           style={styles.input}
         />
 
-        <Text>Sélectionnez une association :</Text>
+        <Text>Select an association :</Text>
         <TouchableOpacity style={styles.input} onPress={() => setModalVisible(true)}>
-          <Text>{event.asso || "Choisir une association"}</Text>
+          <Text>{event.asso || "Choose an association"}</Text>
         </TouchableOpacity>
 
         <Modal visible={modalVisible} animationType="slide" transparent>
@@ -224,7 +232,7 @@ const EditEventScreen = () => {
         </Modal>
 
         <TextInput
-          placeholder="Pourcentage de l'association"
+          placeholder="Percentage of the association"
           placeholderTextColor="gray"
           value={event.pourcentAsso.toString()}
           onChangeText={(text) => setEvent({ ...event, pourcentAsso: text })}
@@ -232,7 +240,7 @@ const EditEventScreen = () => {
           style={styles.input}
         />
 
-        <Text>Date et heure de début :</Text>
+        <Text>Start date and time</Text>
         <DateTimePicker
             value={new Date(event.startDate)} // Assurez-vous que la valeur est un objet Date valide
             mode="datetime"
@@ -262,18 +270,18 @@ const EditEventScreen = () => {
         {selectedImage ? (
             <Image source={{ uri: selectedImage }} style={styles.Image} />
         ) : (
-            <Text style={styles.PlaceHolderText}>Aucune image sélectionnée</Text>
+            <Text style={styles.PlaceHolderText}>no picture select</Text>
         )}
 
         <View style={styles.ButtonContainer}>
             {/* Bouton pour prendre une photo */}
             <TouchableOpacity style={styles.buttonChoisirImage} onPress={takePhoto}>
-            <Text style={styles.modalButtonText}>Prendre une photo</Text>
+            <Text style={styles.modalButtonText}>Take a picture</Text>
             </TouchableOpacity>
 
             {/* Bouton pour choisir une image depuis la galerie */}
             <TouchableOpacity style={styles.buttonChoisirImage} onPress={pickImage}>
-            <Text style={styles.modalButtonText}>Choisir depuis la galerie</Text>
+            <Text style={styles.modalButtonText}>Choose a picture</Text>
             </TouchableOpacity>
         </View>
         </View>
@@ -281,10 +289,11 @@ const EditEventScreen = () => {
         
 
         <TouchableOpacity style={styles.button} onPress={handleSaveChanges}>
-          <Text style={styles.buttonText}>Enregistrer les modifications</Text>
+          <Text style={styles.buttonText}>Save changes</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
+  </View>
   );
 };
 
@@ -295,8 +304,44 @@ const styles = StyleSheet.create({
       alignItems: "center",
       paddingHorizontal: 20,
       paddingVertical: 30,
-      backgroundColor: "white",
+      width: "100%",
+      backgroundColor: "transparent",
     },
+    circleBlue1: {
+      position: 'absolute',
+      top: -35,
+      left: -50,
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: 'rgba(0,122,255,0.5)',
+  },
+  circleBlue2: {
+      position: 'absolute',
+      top: -60,
+      left: 0,
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: 'rgba(0,122,255,0.3)',
+  },
+  circleBlue3: {
+      position: 'absolute',
+      top: -35,
+      right: -50,
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: 'rgba(0,122,255,0.5)',
+  },circleBlue4: {
+      position: 'absolute',
+      top: -60,
+      right: 0,
+      width: 150,
+      height: 150,
+      borderRadius: 75,
+      backgroundColor: 'rgba(0,122,255,0.3)',
+  },
     backButton: {
       position: "absolute",
       top: 20,
@@ -312,8 +357,8 @@ const styles = StyleSheet.create({
     ButtonContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginLeft: -35,
-        width: "100%",
+        marginLeft: -100,
+        width: "50%",
         marginTop: 10,
       },
       buttonChoisirImage: {
@@ -343,7 +388,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 40,
       borderRadius: 10,
       marginTop: 20,
-      width: "90%",
+      width: "80%",
     },
     buttonText: {
       color: "white",

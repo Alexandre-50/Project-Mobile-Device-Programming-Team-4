@@ -56,7 +56,7 @@ const LoginScreen = () => {
             <View style={styles.circleBlue4}></View>
             <Text style={styles.title}>Connexion</Text>
             <TextInput
-                placeholder="Adresse e-mail"
+                placeholder="e-mail adress"
                 placeholderTextColor="gray"
                 value={email}
                 onChangeText={setEmail}
@@ -65,7 +65,7 @@ const LoginScreen = () => {
             />
             <View style={styles.passwordContainer}>
                 <TextInput
-                    placeholder="Mot de passe"
+                    placeholder="Password"
                     placeholderTextColor="gray"
                     value={password}
                     onChangeText={setPassword}
@@ -81,7 +81,7 @@ const LoginScreen = () => {
                 </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={() => router.push('./ForgotPasswordScreen')}>
-                    <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
+                    <Text style={styles.forgotPasswordText}>Forgot Password ?</Text>
                 </TouchableOpacity>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>

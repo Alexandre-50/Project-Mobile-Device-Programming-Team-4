@@ -205,22 +205,22 @@ const uploadImage = async (uri: string): Promise<string> => {
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Ajouter un événement</Text>
+        <Text style={styles.title}>Add Event</Text>
 
         <TextInput
-          placeholder="Nom de l'événement"
+          placeholder="Event Name"
           placeholderTextColor="gray"
           value={eventName}
           onChangeText={setEventName}
           style={styles.input}
         />
 
-        <Text>Sélectionnez une association :</Text>
+        <Text>Select an association :</Text>
         <TouchableOpacity
           style={styles.input}
           onPress={() => setModalVisible(true)}
         >
-          <Text>{selectedAsso || "Choisir une association"}</Text>
+          <Text>{selectedAsso || "Choose an association"}</Text>
         </TouchableOpacity>
 
         <Modal visible={modalVisible} animationType="slide" transparent>
@@ -246,7 +246,7 @@ const uploadImage = async (uri: string): Promise<string> => {
         </Modal>
 
         <TextInput
-          placeholder="Pourcentage de l'association"
+          placeholder="Percentage of the association"
           placeholderTextColor="gray"
           value={percentage}
           onChangeText={setPercentage}
@@ -254,7 +254,7 @@ const uploadImage = async (uri: string): Promise<string> => {
           style={styles.input}
         />
 
-        <Text>Date et heure de début :</Text>
+        <Text>Start date and time :</Text>
         <DateTimePicker
           value={startDate}
           mode="datetime"
@@ -264,7 +264,7 @@ const uploadImage = async (uri: string): Promise<string> => {
           }
         />
 
-        <Text>Date et heure de fin :</Text>
+        <Text>End date and time :</Text>
         <DateTimePicker
           value={endDate}
           mode="datetime"
@@ -277,15 +277,15 @@ const uploadImage = async (uri: string): Promise<string> => {
           {selectedImage ? (
             <Image source={{ uri: selectedImage }} style={styles.Image} />
           ) : (
-            <Text style={styles.PlaceHolderText}>Aucune image sélectionnée</Text>
+            <Text style={styles.PlaceHolderText}>No picture selected</Text>
           )}
 
           <View style={styles.ButtonContainer}>
             <TouchableOpacity style={styles.buttonChoisirImage} onPress={takePhoto}>
-              <Text style={styles.modalButtonText}>Prendre une photo</Text>
+              <Text style={styles.modalButtonText}>Take a picture</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonChoisirImage} onPress={pickImage}>
-              <Text style={styles.modalButtonText}>Choisir depuis la galerie</Text>
+              <Text style={styles.modalButtonText}>Choose a picture</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -293,7 +293,7 @@ const uploadImage = async (uri: string): Promise<string> => {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <TouchableOpacity style={styles.button} onPress={handleAddEvent}>
-          <Text style={styles.buttonText}>Ajouter l'événement</Text>
+          <Text style={styles.buttonText}>Add Event</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -97,17 +97,17 @@ const AddAdminScreen = () => {
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.title}>Créer un compte Admin</Text>
+            <Text style={styles.title}>Create Admin Account</Text>
             
             <TextInput
-              placeholder="Nom"
+              placeholder="Name"
               placeholderTextColor="gray"
               value={nom}
               onChangeText={setNom}
               style={styles.input}
             />
             <TextInput
-              placeholder="Prénom"
+              placeholder="Surname"
               placeholderTextColor="gray"
               value={Prenom}
               onChangeText={setPrenom}
@@ -115,7 +115,7 @@ const AddAdminScreen = () => {
             />
             
             <TextInput
-              placeholder="Adresse e-mail"
+              placeholder="e-mail adress"
               placeholderTextColor="gray"
               value={email}
               onChangeText={setEmail}
@@ -125,7 +125,7 @@ const AddAdminScreen = () => {
             
             <View style={styles.passwordContainer}>
               <TextInput
-                placeholder="Mot de passe"
+                placeholder="Password"
                 placeholderTextColor="gray"
                 value={password}
                 onChangeText={setPassword}
@@ -143,7 +143,7 @@ const AddAdminScreen = () => {
 
             <View style={styles.passwordContainer}>
               <TextInput
-                placeholder="Confirmer le mot de passe"
+                placeholder="confirm password"
                 placeholderTextColor="gray"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
@@ -162,7 +162,7 @@ const AddAdminScreen = () => {
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             
             <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-              <Text style={styles.buttonText}>S'inscrire</Text>
+              <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>

@@ -104,7 +104,7 @@ const ManageAdminScreen = () => {
                 <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
             
-            <Text style={styles.title}>Liste des Admin</Text>
+            <Text style={styles.title}> Admin List</Text>
             {isSuperAdmin ? (
                 <View style={styles.adminListWrapper}>
                     <ScrollView contentContainerStyle={styles.adminListContainer}>
@@ -122,11 +122,11 @@ const ManageAdminScreen = () => {
                     </ScrollView>
                 </View>
             ) : (
-                <Text style={styles.errorText}>Accès non autorisé</Text>
+                <Text style={styles.errorText}>unauthorized access</Text>
             )}
             {isSuperAdmin && (
                 <TouchableOpacity style={styles.button} onPress={() => router.push('./AddAdminScreen')}>
-                    <Text style={styles.buttonText}>Ajouter un Admin</Text>
+                    <Text style={styles.buttonText}>Add Admin</Text>
                 </TouchableOpacity>
             )}
         </View>

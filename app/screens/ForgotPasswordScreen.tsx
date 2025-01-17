@@ -13,20 +13,20 @@ const ForgotPasswordScreen = () => {
 
     const handlePasswordReset = async () => {
         if (!email) {
-            setError('Veuillez saisir votre adresse e-mail.');
+            setError('Plesae fill the e-mail field.');
             return;
         }
 
         try {
             await sendPasswordResetEmail(auth, email);
             Alert.alert(
-                'E-mail envoyé',
-                'Un lien de réinitialisation de mot de passe a été envoyé à votre adresse e-mail.'
+                'E-mail Send',
+                'A link to reset your password has been sent to your email address.'
             );
             router.push('./LoginScreen'); // Redirige vers la page de connexion
         } catch (error) {
-            console.error('Erreur lors de la réinitialisation du mot de passe:', error);
-            setError("Impossible d'envoyer l'e-mail. Vérifiez votre adresse e-mail.");
+            console.error('Error during password reset:', error);
+            setError("Impossible to send an e-mail. Check your e-mail adress.");
         }
     };
 
@@ -49,9 +49,9 @@ const ForgotPasswordScreen = () => {
 
                 
 
-                <Text style={styles.title}>Réinitialiser le mot de passe</Text>
+                <Text style={styles.title}>Reset password</Text>
                 <TextInput
-                    placeholder="Adresse e-mail"
+                    placeholder="e-mail adress"
                     placeholderTextColor="gray"
                     value={email}
                     onChangeText={setEmail}
@@ -61,7 +61,7 @@ const ForgotPasswordScreen = () => {
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
                 <TouchableOpacity style={styles.button} onPress={handlePasswordReset}>
-                    <Text style={styles.buttonText}>Réinitialiser</Text>
+                    <Text style={styles.buttonText}>Reset</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

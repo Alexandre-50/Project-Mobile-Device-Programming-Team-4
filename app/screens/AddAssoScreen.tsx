@@ -29,7 +29,7 @@ const AddAssoScreen = () => {
 
     const handleAddAsso = async () => {
         if (!name || !description || !link) {
-            setError('Veuillez remplir tous les champs.');
+            setError('Please fill all the fields.');
             return;
         }
         try {
@@ -58,9 +58,9 @@ const AddAssoScreen = () => {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <MaterialIcons name="arrow-back" size={24} color="black" />
                 </TouchableOpacity>
-                <Text style={styles.title}>Ajouter une Association</Text>
+                <Text style={styles.title}>Add an Association</Text>
                 <TextInput
-                    placeholder="Nom de l'association"
+                    placeholder="Name of the association"
                     placeholderTextColor="gray"
                     value={name}
                     onChangeText={setName}
@@ -73,16 +73,10 @@ const AddAssoScreen = () => {
                     onChangeText={setDescription}
                     style={styles.input}
                 />
-                <TextInput
-                    placeholder="Lien"
-                    placeholderTextColor="gray"
-                    value={link}
-                    onChangeText={setLink}
-                    style={styles.input}
-                />
+                
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
                 <TouchableOpacity style={styles.button} onPress={handleAddAsso}>
-                    <Text style={styles.buttonText}>Ajouter</Text>
+                    <Text style={styles.buttonText}>Add</Text>
                 </TouchableOpacity>
             </ScrollView>
         </KeyboardAvoidingView>

@@ -102,7 +102,7 @@ const CreateAccountScreen = () => {
             <View style={styles.circleBlue2}></View> 
             <View style={styles.circleBlue3}></View>
             <View style={styles.circleBlue4}></View> 
-            <Text style={styles.title}>Créer un compte</Text>
+            <Text style={styles.title}>Create an account</Text>
             <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
               <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
@@ -116,35 +116,35 @@ const CreateAccountScreen = () => {
                 keyboardShouldPersistTaps="handled"
               >
                 <TextInput
-                  placeholder="Nom"
+                  placeholder="Name"
                   placeholderTextColor="gray"
                   value={nom}
                   onChangeText={setNom}
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Prénom"
+                  placeholder="Surname"
                   placeholderTextColor="gray"
                   value={Prenom}
                   onChangeText={setPrenom}
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Adresse"
+                  placeholder="Adress"
                   placeholderTextColor="gray"
                   value={Adresse}
                   onChangeText={setAdresse}
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Pays"
+                  placeholder="Country"
                   placeholderTextColor="gray"
                   value={Pays}
                   onChangeText={setPays}
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Code Postal"
+                  placeholder="Zip  code"
                   placeholderTextColor="gray"
                   value={CodePostal}
                   onChangeText={setCodePostal}
@@ -152,14 +152,14 @@ const CreateAccountScreen = () => {
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Ville"
+                  placeholder="City"
                   placeholderTextColor="gray"
                   value={Ville}
                   onChangeText={setVille}
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Adresse e-mail"
+                  placeholder="e-mail adress"
                   placeholderTextColor="gray"
                   value={email}
                   onChangeText={setEmail}
@@ -169,7 +169,7 @@ const CreateAccountScreen = () => {
                 
                 <View style={styles.passwordContainer}>
                   <TextInput
-                    placeholder="Mot de passe"
+                    placeholder="Password"
                     placeholderTextColor="gray"
                     value={password}
                     onChangeText={setPassword}
@@ -187,7 +187,7 @@ const CreateAccountScreen = () => {
                 
                 <View style={styles.passwordContainer}>
                   <TextInput
-                    placeholder="Confirmer le mot de passe"
+                    placeholder="Confirm password"
                     placeholderTextColor="gray"
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
@@ -206,7 +206,7 @@ const CreateAccountScreen = () => {
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
             
                 <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-                  <Text style={styles.buttonText}>S'inscrire</Text>
+                  <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
               </ScrollView>
             </KeyboardAvoidingView>

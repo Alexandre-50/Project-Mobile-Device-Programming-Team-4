@@ -85,7 +85,7 @@ const ManageAssoScreen = () => {
             <TouchableOpacity style={styles.backButton} onPress={() => router.push('./SuperAdminScreen')}>
                 <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-            <Text style={styles.title}>Liste des Assos</Text>
+            <Text style={styles.title}>Associations List</Text>
 
             {isSuperAdmin ? (
                 <View style={styles.assoListWrapper}>
@@ -108,7 +108,7 @@ const ManageAssoScreen = () => {
             )}
             {isSuperAdmin && (
                 <TouchableOpacity style={styles.button} onPress={() => router.push('./AddAssoScreen')}>
-                    <Text style={styles.buttonText}>Ajouter une Association</Text>
+                    <Text style={styles.buttonText}>Add Association</Text>
                 </TouchableOpacity>
             )}
         </View>
