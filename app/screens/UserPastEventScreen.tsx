@@ -7,9 +7,19 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  query,
+  getDoc,
+  where,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 interface EventData {
   id: string;
@@ -27,6 +37,7 @@ const PastEventsScreen = () => {
   const [pastEvents, setPastEvents] = useState<EventData[]>([]);
   const router = useRouter();
   const db = getFirestore();
+  
 
   useEffect(() => {
     const fetchPastEvents = async () => {
@@ -47,12 +58,13 @@ const PastEventsScreen = () => {
               participations: data.participations || 0,
               pourcentAsso: data.pourcentAsso || 0,
               imageUrl: data.imageUrl || null,
-              winner: data.winner || "",
+              winner: data.winner || "0", // Par défaut, on considère "0" comme non défini
             };
           })
           .filter((event) => event.endDate < now); // Filtrer uniquement les événements passés
 
         setPastEvents(eventList);
+        checkAndDrawWinners(eventList);
       } catch (error) {
         console.error("Erreur lors de la récupération des événements passés :", error);
       }
@@ -61,10 +73,111 @@ const PastEventsScreen = () => {
     fetchPastEvents();
   }, []);
 
+  const checkAndDrawWinners = async (events: EventData[]) => {
+    for (const event of events) {
+      if (event.winner === "0") {
+        try {
+          // Récupérer tous les participants de l'événement
+          const participationRef = collection(db, "participations");
+          const participationQuery = query(
+            participationRef,
+            where("eventId", "==", event.id)
+          );
+          const participationSnap = await getDocs(participationQuery);
+
+          const participants = participationSnap.docs.map((doc) => doc.data().userId);
+
+          if (participants.length === 0) {
+            console.log(`Aucun participant pour l'événement ${event.nom}`);
+            continue;
+          }
+
+          // Tirage au sort
+          const randomIndex = Math.floor(Math.random() * participants.length);
+          const winnerId = participants[randomIndex];
+
+          // Récupérer les informations du gagnant
+          const userRef = doc(db, "users", winnerId);
+          const userSnap = await getDoc(userRef);
+
+          if (!userSnap.exists()) {
+            console.error(`Utilisateur introuvable pour l'ID : ${winnerId}`);
+            continue;
+          }
+
+          const userData = userSnap.data();
+          const winnerName = `${userData.prenom} ${userData.nom}`;
+          const winnerEmail = userData.email;
+
+          // Mettre à jour le gagnant dans la base de données
+          const eventRef = doc(db, "evenements", event.id);
+          await updateDoc(eventRef, { winner: winnerName });
+
+          console.log(`Gagnant désigné pour l'événement ${event.nom}: ${winnerName}`);
+
+          // Envoyer un e-mail au gagnant
+          await sendEmailToWinner(winnerEmail, winnerName, event.nom);
+        } catch (error) {
+          console.error(
+            `Erreur lors du tirage au sort pour l'événement ${event.nom}:`,
+            error
+          );
+        }
+      }
+    }
+
+    // Recharger les événements après mise à jour
+    const updatedEventsSnap = await getDocs(collection(db, "evenements"));
+    const updatedEventList: EventData[] = updatedEventsSnap.docs
+      .map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          nom: data.nom || "Nom inconnu",
+          asso: data.asso || "Association inconnue",
+          startDate: new Date(data.startDate.seconds * 1000),
+          endDate: new Date(data.endDate.seconds * 1000),
+          participations: data.participations || 0,
+          pourcentAsso: data.pourcentAsso || 0,
+          imageUrl: data.imageUrl || null,
+          winner: data.winner || "0",
+        };
+      })
+      .filter((event) => event.endDate < new Date());
+
+    setPastEvents(updatedEventList);
+  };
+
+  const sendEmailToWinner = async (
+    email: string,
+    name: string,
+    eventName: string
+  ) => {
+    try {
+      const response = await fetch("https://mail.google.com/mail/u/1/#inbox?compose=new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: email,
+          subject: "Félicitations ! Vous êtes le gagnant !",
+          message: `Bonjour ${name},\n\nVous avez été désigné comme gagnant de l'événement "${eventName}". Félicitations !\n\nMerci de votre participation.\n\nL'équipe.`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'envoi de l'e-mail");
+      }
+
+      console.log(`E-mail envoyé avec succès à ${email}`);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi de l'e-mail :", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      
-
       <FlatList
         data={pastEvents}
         keyExtractor={(item) => item.id}

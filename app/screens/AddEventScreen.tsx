@@ -175,6 +175,7 @@ const uploadImage = async (uri: string): Promise<string> => {
         endDate: Timestamp.fromDate(endDate),
         participations: "0",
         imageUrl: imageUrl, // Ajoute l'URL de l'image
+        winner: "0",
       });
   
       quitter();
