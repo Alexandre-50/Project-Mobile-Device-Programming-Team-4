@@ -41,6 +41,7 @@ const UserScreen = () => {
   const [loading, setLoading] = useState(true);
   const [nextEvent, setNextEvent] = useState<EventData | null>(null);
   const auth = getAuth();
+  const [hasParticipated, setHasParticipated] = useState(false);
   const db = getFirestore();
   const router = useRouter();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -78,6 +79,20 @@ const UserScreen = () => {
           .filter((event) => event.startDate > today)
           .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
         setNextEvent(futureEvents[0] || null);
+
+        // Vérifier si l'utilisateur a participé
+        if (todayEvent && auth.currentUser) {
+          const userId = auth.currentUser.uid;
+          const participationRef = collection(db, "participations");
+          const participationDocs = await getDocs(participationRef);
+
+          const hasUserParticipated = participationDocs.docs.some((doc) => {
+            const data = doc.data();
+            return data.userId === userId && data.eventId === todayEvent.id;
+          });
+
+          setHasParticipated(hasUserParticipated);
+        }
       } catch (error) {
         console.error("Erreur lors de la récupération des événements :", error);
       } finally {
@@ -316,7 +331,14 @@ const UserScreen = () => {
                 : 0}{" "}
               tickets à ce prix
             </Text>
-            <TouchableOpacity
+
+
+            {hasParticipated ? (
+              <Text style={styles.participationMessage}>
+                Tu as déjà participé à l'événement.
+              </Text>
+            ) : (
+              <TouchableOpacity
               style={styles.participateButton}
               onPress={handlePayment}
             >
@@ -328,6 +350,10 @@ const UserScreen = () => {
                 €
               </Text>
             </TouchableOpacity>
+            )}
+
+
+            
             <TouchableOpacity
               style={styles.ancienEvenementButton}
               onPress={() => router.push("./UserPastEventScreen")}
@@ -468,6 +494,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#d9534f",
     marginBottom: 20,
+    textAlign: "center",
+  },
+  participationMessage: {
+    fontSize: 18,
+    color: "green",
+    marginTop: 10,
     textAlign: "center",
   },
   participateButton: {
