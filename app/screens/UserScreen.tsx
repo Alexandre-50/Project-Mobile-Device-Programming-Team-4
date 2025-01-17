@@ -19,6 +19,7 @@ import {
   updateDoc,
   increment,
   addDoc,
+  onSnapshot, query, where, orderBy
 } from "firebase/firestore";
 import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
 import * as Linking from "expo-linking";
@@ -45,16 +46,22 @@ const UserScreen = () => {
   const db = getFirestore();
   const router = useRouter();
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [timeRemaining, setTimeRemaining] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const eventCollectionRef = collection(db, "evenements");
-        const eventDocsSnap = await getDocs(eventCollectionRef);
 
+  
+
+useEffect(() => {
+  const fetchEvents = () => {
+    try {
+      const eventCollectionRef = collection(db, "evenements");
+      const q = query(eventCollectionRef, orderBy("startDate")); // Trier par date de début
+
+      // Écouter en temps réel
+      const unsubscribe = onSnapshot(q, (snapshot) => {
         const today = new Date();
 
-        const eventList: EventData[] = eventDocsSnap.docs.map((doc) => {
+        const eventList: EventData[] = snapshot.docs.map((doc) => {
           const data = doc.data();
           return {
             id: doc.id,
@@ -84,24 +91,28 @@ const UserScreen = () => {
         if (todayEvent && auth.currentUser) {
           const userId = auth.currentUser.uid;
           const participationRef = collection(db, "participations");
-          const participationDocs = await getDocs(participationRef);
+          const qParticipation = query(
+            participationRef,
+            where("eventId", "==", todayEvent.id),
+            where("userId", "==", userId)
+          );
 
-          const hasUserParticipated = participationDocs.docs.some((doc) => {
-            const data = doc.data();
-            return data.userId === userId && data.eventId === todayEvent.id;
+          onSnapshot(qParticipation, (participationSnapshot) => {
+            setHasParticipated(!participationSnapshot.empty);
           });
-
-          setHasParticipated(hasUserParticipated);
         }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des événements :", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      });
 
-    fetchEvents();
-  }, []);
+      // Nettoyer l'écoute
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Erreur lors de la récupération des événements :", error);
+    }
+  };
+
+  fetchEvents();
+}, []);
+
 
   useEffect(() => {
     // Récupérer l'ID client Stripe de l'utilisateur connecté
@@ -144,16 +155,36 @@ const UserScreen = () => {
       Alert.alert("Erreur", "Impossible d'enregistrer la participation.");
     }
   };
+  useEffect(() => {
+    if (!eventOfTheDay || !eventOfTheDay.endDate) return;
+  
+    const interval = setInterval(() => {
+      const now = new Date();
+      const diff = eventOfTheDay.endDate.getTime() - now.getTime();
+  
+      if (diff <= 0) {
+        clearInterval(interval);
+        setTimeRemaining(null); // L'événement est terminé
+      } else {
+        setTimeRemaining(calculateTimeRemaining(diff));
+      }
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [eventOfTheDay]);
+  
+  
+  
 
-  const calculateTimeRemaining = (date: Date) => {
-    const now = new Date();
-    const diff = date.getTime() - now.getTime();
+  const calculateTimeRemaining = (diff: number) => {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  
     return `${days}j ${hours}h ${minutes}m ${seconds}s`;
   };
+  
 
   const calculatePrice = (participations: number) => {
     if (participations < 100) return 1;
@@ -266,13 +297,7 @@ const UserScreen = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text>Chargement...</Text>
-      </View>
-    );
-  }
+  
 
   return (
     <StripeProvider publishableKey={publicKey}>
@@ -301,11 +326,10 @@ const UserScreen = () => {
               style={styles.eventImage}
             />
             <Text style={styles.eventRemainingTime}>
-              Fin dans{" "}
-              {eventOfTheDay
-                ? calculateTimeRemaining(eventOfTheDay.endDate)
-                : "--"}
+              Fin dans {timeRemaining || "--"}
             </Text>
+
+
             <Text style={styles.eventParticipation}>
               Actuellement : {eventOfTheDay ? eventOfTheDay.participations : 0}{" "}
               participations
