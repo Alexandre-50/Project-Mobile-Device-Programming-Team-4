@@ -20,6 +20,7 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
+import { MaterialIcons, FontAwesome } from "@expo/vector-icons";
 
 interface EventData {
   id: string;
@@ -37,7 +38,6 @@ const PastEventsScreen = () => {
   const [pastEvents, setPastEvents] = useState<EventData[]>([]);
   const router = useRouter();
   const db = getFirestore();
-  
 
   useEffect(() => {
     const fetchPastEvents = async () => {
@@ -66,7 +66,10 @@ const PastEventsScreen = () => {
         setPastEvents(eventList);
         checkAndDrawWinners(eventList);
       } catch (error) {
-        console.error("Erreur lors de la récupération des événements passés :", error);
+        console.error(
+          "Erreur lors de la récupération des événements passés :",
+          error
+        );
       }
     };
 
@@ -84,41 +87,45 @@ const PastEventsScreen = () => {
             where("eventId", "==", event.id)
           );
           const participationSnap = await getDocs(participationQuery);
-  
-          const participants = participationSnap.docs.map((doc) => doc.data().userId);
-  
+
+          const participants = participationSnap.docs.map(
+            (doc) => doc.data().userId
+          );
+
           if (participants.length === 0) {
             console.log(`Aucun participant pour l'événement ${event.nom}`);
-  
+
             // Mettre à jour le gagnant dans la base de données avec "Aucun Gagnant"
             const eventRef = doc(db, "evenements", event.id);
             await updateDoc(eventRef, { winner: "Aucun Gagnant" });
             continue; // Passer à l'événement suivant
           }
-  
+
           // Tirage au sort
           const randomIndex = Math.floor(Math.random() * participants.length);
           const winnerId = participants[randomIndex];
-  
+
           // Récupérer les informations du gagnant
           const userRef = doc(db, "users", winnerId);
           const userSnap = await getDoc(userRef);
-  
+
           if (!userSnap.exists()) {
             console.error(`Utilisateur introuvable pour l'ID : ${winnerId}`);
             continue;
           }
-  
+
           const userData = userSnap.data();
           const winnerName = `${userData.prenom} ${userData.nom}`;
           const winnerEmail = userData.email;
-  
+
           // Mettre à jour le gagnant dans la base de données
           const eventRef = doc(db, "evenements", event.id);
-          await updateDoc(eventRef, { winner: winnerName });
-  
-          console.log(`Gagnant désigné pour l'événement ${event.nom}: ${winnerName}`);
-  
+          await updateDoc(eventRef, { winner: winnerId });
+
+          console.log(
+            `Gagnant désigné pour l'événement ${event.nom}: ${winnerName}`
+          );
+
           // Vous pouvez également ajouter ici l'envoi d'un e-mail au gagnant
         } catch (error) {
           console.error(
@@ -128,7 +135,7 @@ const PastEventsScreen = () => {
         }
       }
     }
-  
+
     // Recharger les événements après mise à jour
     const updatedEventsSnap = await getDocs(collection(db, "evenements"));
     const updatedEventList: EventData[] = updatedEventsSnap.docs
@@ -147,16 +154,30 @@ const PastEventsScreen = () => {
         };
       })
       .filter((event) => event.endDate < new Date());
-  
+
     setPastEvents(updatedEventList);
   };
-  
-
- 
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.profileButton}
+        onPress={() => router.push("./ProfileAccountScreen")}
+      >
+        <FontAwesome name="user" size={24} color="white" />
+      </TouchableOpacity>
+      <View style={styles.circleBlue1}></View>
+      <View style={styles.circleBlue2}></View>
+      <View style={styles.circleBlue3}></View>
+      <View style={styles.circleBlue4}></View>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.push("./UserScreen")}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="black" />
+      </TouchableOpacity>
       <FlatList
+        style={styles.FlatList}
         data={pastEvents}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -191,30 +212,77 @@ const PastEventsScreen = () => {
           </View>
         )}
       />
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Text style={styles.backButtonText}>Retour</Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
     backgroundColor: "white",
-    padding: 16,
+  },
+  profileButton: {
+    backgroundColor: "#56AEFF",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 50,
+    transform: [{ translateX: -30 }],
+    left: "50%",
   },
   backButton: {
-    backgroundColor: "#007bff",
+    position: "absolute",
+    top: 40,
+    left: 20,
     padding: 10,
-    width: "90%",
-    alignItems: "center",
-    left: "5%",
   },
-  backButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+  circleBlue1: {
+    position: "absolute",
+    top: -35,
+    left: -50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(0,122,255,0.5)",
+  },
+  circleBlue2: {
+    position: "absolute",
+    top: -60,
+    left: 0,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(0,122,255,0.3)",
+  },
+  circleBlue3: {
+    position: "absolute",
+    top: -35,
+    right: -50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(0,122,255,0.5)",
+  },
+  circleBlue4: {
+    position: "absolute",
+    top: -60,
+    right: 0,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(0,122,255,0.3)",
+  },
+  FlatList: {
+    position: "absolute",
+    width: "100%",
+    height: "850%",
+    top: "15%",
+    backgroundColor: "white",
+    padding: 16,
   },
   eventCard: {
     flexDirection: "row",
